@@ -1,0 +1,7 @@
+/.expo/
+/.expo-shared/
+/assets/
+/node_modules/
+
+/*.lock
+/*.json

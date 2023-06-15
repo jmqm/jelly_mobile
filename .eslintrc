@@ -1,0 +1,21 @@
+{
+    "root": true,
+    "parser": "@typescript-eslint/parser",
+    "plugins": ["@typescript-eslint"],
+    "overrides": [
+        {
+            "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
+            "rules": {
+                "no-shadow": "off",
+                "indent": ["error", 4, { "ignoredNodes": ["ConditionalExpression"] }],
+                "semi": ["error", "always"],
+                "quotes": ["error", "single"],
+                "eol-last": ["error", "always"],
+                "comma-dangle": ["error", "never"],
+                "require-await": "error",
+
+                "no-unused-vars": ["warn", { "vars": "all", "args": "all", "ignoreRestSiblings": true }]
+            }
+        }
+    ]
+}

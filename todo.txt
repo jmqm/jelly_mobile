@@ -1,0 +1,4 @@
+- Add React-Redux and Redux-Persist
+    - In JellyfinAPI, use Redux to get serverInfo
+- Save section last state (i.e. continue watching, next up)
+    - When last state is loaded, user scrolls past through list and new state is loaded, I want the scroll location to be the same
