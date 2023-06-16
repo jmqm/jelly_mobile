@@ -112,10 +112,10 @@ export const GetUserLibraries = async (serverInfo: TServerInfo): Promise<TLibrar
     return ConvertToTLibrary();
 };
 
-export const GetUserLibraryLatest = async (serverInfo: TServerInfo): Promise<TLibrary[]> => {
+export const GetUserLibraryLatest = async (serverInfo: TServerInfo, libraryId: string): Promise<TMedia[]> => {
     try {
         const response = await fetch(`${serverInfo.address}/Users/${serverInfo.userId}/Items/Latest` +
-                                     '?Limit=16', {
+                                     `?Limit=16&ParentId=${libraryId}`, {
             headers: {
                 ...GenerateAuthorizationHeader(serverInfo)
             }
@@ -124,12 +124,12 @@ export const GetUserLibraryLatest = async (serverInfo: TServerInfo): Promise<TLi
         const data = await response.text();
         const dataJson = JSON.parse(data);
 
-        return ConvertToTLibrary(dataJson);
+        return ConvertToTMedia(dataJson);
     } catch (error) {
         console.log(`${GetUserLibraryLatest.name} exception: ${error}`);
     }
 
-    return ConvertToTLibrary();
+    return ConvertToTMedia();
 };
 
 //#endregion

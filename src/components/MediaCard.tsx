@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { View, Image, StyleSheet, Dimensions } from 'react-native';
 import { Text, ProgressBar, useTheme } from 'react-native-paper';
 import EMediaType from 'src/enums/EMediaType';
+import ESeriesStatus from 'src/enums/ESeriesStatus';
 import TMedia from 'src/types/JellyfinAPI/TMedia';
 import TServerInfo from 'src/types/server/TServerInfo';
 
@@ -17,12 +18,16 @@ const MediaCard = (props: TProps) => {
 
     const theme = useTheme();
 
-    const title = media.Type === EMediaType.Episode ? media.Series
-                : media.Type === EMediaType.Movie ? media.Name
+    const title = media.Type === EMediaType.Movie ? media.Name
+                : media.Type === EMediaType.Series ? media.Name
+                : media.Type === EMediaType.Episode ? media.Series
+                : media.Type === EMediaType.Audio ? media.Name
                 : 'Unsupported Media Type';
 
-    const subtitle = media.Type === EMediaType.Episode ? `S${media.Season}:E${media.Episode} - ${media.Name}`
-                   : media.Type === EMediaType.Movie ? media.Year
+    const subtitle = media.Type === EMediaType.Movie ? media.Year
+                   : media.Type === EMediaType.Series ? `${media.Year}${media.SeriesStatus === ESeriesStatus.Continuing ? ' - Continuing' : ''}`
+                   : media.Type === EMediaType.Episode ? `S${media.Season}:E${media.SeriesEpisode} - ${media.Name}`
+                   : media.Type === EMediaType.Audio ? media.AudioArtists.join(', ')
                    : 'Unsupported Media Type';
 
     const handleOnError = () => {

@@ -2,7 +2,9 @@
 
 enum EMediaType {
     Movie = 'Movie',
+    Series = 'Series',
     Episode = 'Episode',
+    Audio = 'Audio',
     CollectionFolder = 'CollectionFolder'
 };
 

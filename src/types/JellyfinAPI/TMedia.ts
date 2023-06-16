@@ -1,4 +1,5 @@
 import EMediaType from 'src/enums/EMediaType';
+import ESeriesStatus from 'src/enums/ESeriesStatus';
 
 type TMedia = {
     Type: EMediaType;
@@ -9,14 +10,18 @@ type TMedia = {
     Year: number;
     PlayedPercentage: number;
 
-    // Episode
+    // Series
     Series: string;
     SeriesId: number;
+    SeriesStatus: ESeriesStatus;
 
     Season: number;
     SeasonId: number;
 
-    Episode: number;
+    SeriesEpisode: number;
+
+    // Audio
+    AudioArtists: string[];
 };
 
 export const ConvertToTMedia = (json?: any): TMedia[] => {
@@ -26,7 +31,16 @@ export const ConvertToTMedia = (json?: any): TMedia[] => {
         return [];
     }
 
-    return json.Items.map((item: any) => {
+    const mapping =
+        json.Items !== undefined ? json.Items :
+        json !== undefined ? json :
+        null;
+
+    if (mapping === null) {
+        return [];
+    }
+
+    return mapping.map((item: any) => {
         return {
             Type: item.Type ?? 'Type Unknown',
 
@@ -35,14 +49,18 @@ export const ConvertToTMedia = (json?: any): TMedia[] => {
             Year: item.ProductionYear ?? 'ProductionYear Unknown',
             PlayedPercentage: item.UserData.PlayedPercentage ?? 'PlayedPercentage Unknown',
 
-            // Episode
+            // Series
             Series: item.SeriesName ?? 'SeriesName Unknown',
             SeriesId: item.SeriesId ?? 'SeriesId Unknown',
+            SeriesStatus: item.Status ?? 'SeriesStatus Unknown',
 
             Season: item.ParentIndexNumber ?? 'ParentIndexNumber Unknown',
             SeasonId: item.SeasonId ?? 'SeasonId Unknown',
 
-            Episode: item.IndexNumber ?? 'IndexNumber Unknown'
+            SeriesEpisode: item.IndexNumber ?? 'IndexNumber Unknown',
+
+            // Audio
+            AudioArtists: item.Artists ? item.Artists.map((artist: string) => artist) : 'Artists Unknown'
         } as TMedia;
     });
 };

@@ -2,6 +2,7 @@
 
 enum ELibraryType {
     MusicPlaylist = 'playlists',
+    Music = 'music',
     Collection = 'boxsets',
     LiveTv = 'livetv',
     Channels = 'channels'

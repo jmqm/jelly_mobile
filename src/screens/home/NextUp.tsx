@@ -10,7 +10,6 @@ const NextUpComponent = () => {
     const { serverInfo } = useServerInfo();
 
     const [nextUp, setNextUp] = useState<TMedia[]>([]);
-    const [, setFlatList] = useState<FlatList | null>(null);
 
     useEffect(() => {
         const load = async () => {
@@ -26,13 +25,12 @@ const NextUpComponent = () => {
     return (
         <SectionContainer title='Next Up'>
             <FlatList
-                ref={(ref) => setFlatList(ref)}
                 horizontal={true}
                 bounces={false}
                 data={nextUp}
                 style={styles.flatList}
                 renderItem={({ item }) => <MediaCard serverInfo={serverInfo} media={item} />}
-                ItemSeparatorComponent={() => <View style={{ marginLeft: 15 }} />}
+                ItemSeparatorComponent={() => <View style={{ marginLeft: 16 }} />}
             />
         </SectionContainer>
     );

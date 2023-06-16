@@ -10,7 +10,6 @@ const ContinueWatchingComponent = () => {
     const { serverInfo } = useServerInfo();
 
     const [continueWatching, setContinueWatching] = useState<TMedia[]>([]);
-    const [, setFlatList] = useState<FlatList | null>(null);
 
     useEffect(() => {
         const load = async () => {
@@ -23,13 +22,12 @@ const ContinueWatchingComponent = () => {
     return (
         <SectionContainer title='Continue Watching'>
             <FlatList
-                ref={(ref) => setFlatList(ref)}
                 horizontal={true}
                 bounces={false}
                 data={continueWatching}
                 style={styles.flatList}
                 renderItem={({ item }) => <MediaCard serverInfo={serverInfo} media={item} />}
-                ItemSeparatorComponent={() => <View style={{ marginLeft: 15 }} />}
+                ItemSeparatorComponent={() => <View style={{ marginLeft: 16 }} />}
             />
         </SectionContainer>
     );
