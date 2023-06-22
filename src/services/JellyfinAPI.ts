@@ -5,8 +5,8 @@ import TServerInfo from 'src/types/server/TServerInfo';
 import Constants from 'expo-constants';
 import * as Device from 'expo-device';
 import EHomeSection from 'src/enums/EHomeSection';
-import TMedia, { ConvertToTMedia } from 'src/types/JellyfinAPI/TMedia';
 import TLibrary, { ConvertToTLibrary } from 'src/types/JellyfinAPI/TLibrary';
+import CMedia from 'src/types/JellyfinAPI/media/CMedia';
 
 // https://api.jellyfin.org/
 // https://demo.jellyfin.org/stable/api-docs/swagger/index.html (better)
@@ -112,7 +112,7 @@ export const GetUserLibraries = async (serverInfo: TServerInfo): Promise<TLibrar
     return ConvertToTLibrary();
 };
 
-export const GetUserLibraryLatest = async (serverInfo: TServerInfo, libraryId: string): Promise<TMedia[]> => {
+export const GetUserLibraryLatest = async (serverInfo: TServerInfo, libraryId: string): Promise<CMedia[]> => {
     try {
         const response = await fetch(`${serverInfo.address}/Users/${serverInfo.userId}/Items/Latest` +
                                      `?Limit=16&ParentId=${libraryId}`, {
@@ -124,19 +124,19 @@ export const GetUserLibraryLatest = async (serverInfo: TServerInfo, libraryId: s
         const data = await response.text();
         const dataJson = JSON.parse(data);
 
-        return ConvertToTMedia(dataJson);
+        return dataJson.map((item: any) => CMedia.createInstance(item));
     } catch (error) {
         console.log(`${GetUserLibraryLatest.name} exception: ${error}`);
     }
 
-    return ConvertToTMedia();
+    return [];
 };
 
 //#endregion
 
 //#region Home sections
 
-export const GetContinueWatching = async (serverInfo: TServerInfo): Promise<TMedia[]> => {
+export const GetContinueWatching = async (serverInfo: TServerInfo): Promise<CMedia[]> => {
     try {
         const response = await fetch(`${serverInfo.address}/Users/${serverInfo.userId}/Items/Resume` +
                                      '?Limit=12&Recursive=true&includeItemTypes=Episode,Movie', {
@@ -148,15 +148,15 @@ export const GetContinueWatching = async (serverInfo: TServerInfo): Promise<TMed
         const data = await response.text();
         const dataJson = JSON.parse(data);
 
-        return ConvertToTMedia(dataJson);
+        return dataJson.Items.map((item: any) => CMedia.createInstance(item));
     } catch (error) {
         console.log(`${GetContinueWatching.name} exception: ${error}`);
     }
 
-    return ConvertToTMedia();
+    return [];
 };
 
-export const GetNextUp = async (serverInfo: TServerInfo, cutOffDateTime: Date): Promise<TMedia[]> => {
+export const GetNextUp = async (serverInfo: TServerInfo, cutOffDateTime: Date): Promise<CMedia[]> => {
     try {
         const response = await fetch(`${serverInfo.address}/Shows/NextUp` +
                                      '?UserId=b310988995c24ba3bc58fb3b2f4510b2' +
@@ -169,12 +169,12 @@ export const GetNextUp = async (serverInfo: TServerInfo, cutOffDateTime: Date): 
         const data = await response.text();
         const dataJson = JSON.parse(data);
 
-        return ConvertToTMedia(dataJson);
+        return dataJson.Items.map((item: any) => CMedia.createInstance(item));
     } catch (error) {
         console.log(`${GetNextUp.name} exception: ${error}`);
     }
 
-    return ConvertToTMedia();
+    return [];
 };
 
 //#endregion

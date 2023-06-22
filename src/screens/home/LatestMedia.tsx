@@ -29,33 +29,31 @@ const LatestMediaComponent = () => {
 
     // Load latests
     useEffect(() => {
-        if (userLibraries.length <= 0) {
-            return;
+        if (userLibraries.length > 0) {
+            const load = async () => {
+                const components = await Promise.all(userLibraries.map(async (library) => {
+                    const title = `Latest ${library.Name}`;
+                    const data = await GetUserLibraryLatest(serverInfo, library.Id);
+
+                    return (
+                        <SectionContainer title={title} key={title}>
+                            <FlatList
+                                horizontal={true}
+                                bounces={false}
+                                data={data}
+                                style={styles.flatList}
+                                renderItem={({ item }) => <MediaCard serverInfo={serverInfo} media={item} type='Poster' />}
+                                ItemSeparatorComponent={() => <View style={{ marginLeft: 16 }} />}
+                            />
+                        </SectionContainer>
+                    );
+                }));
+
+                setLatestMediaComponents(components);
+            };
+
+            load();
         }
-
-        const load = async () => {
-            const components = await Promise.all(userLibraries.map(async (library) => {
-                const title = `Latest ${library.Name}`;
-                const data = await GetUserLibraryLatest(serverInfo, library.Id);
-
-                return (
-                    <SectionContainer title={title} key={title}>
-                        <FlatList
-                            horizontal={true}
-                            bounces={false}
-                            data={data}
-                            style={styles.flatList}
-                            renderItem={({ item }) => <MediaCard serverInfo={serverInfo} media={item} />}
-                            ItemSeparatorComponent={() => <View style={{ marginLeft: 16 }} />}
-                        />
-                    </SectionContainer>
-                );
-            }));
-
-            setLatestMediaComponents(components);
-        };
-
-        load();
     }, [userLibraries]);
 
     return (

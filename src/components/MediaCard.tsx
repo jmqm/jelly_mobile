@@ -1,83 +1,100 @@
-import { useState } from 'react';
-import { View, Image, StyleSheet, Dimensions } from 'react-native';
+import { useRef, useState } from 'react';
+import { View, Image, StyleSheet, Dimensions, LayoutChangeEvent } from 'react-native';
 import { Text, ProgressBar, useTheme } from 'react-native-paper';
 import EMediaType from 'src/enums/EMediaType';
-import ESeriesStatus from 'src/enums/ESeriesStatus';
-import TMedia from 'src/types/JellyfinAPI/TMedia';
+import CEpisode from 'src/types/JellyfinAPI/media/CEpisode';
+import CMedia from 'src/types/JellyfinAPI/media/CMedia';
 import TServerInfo from 'src/types/server/TServerInfo';
 
 type TProps = {
     serverInfo: TServerInfo;
-    media: TMedia;
+    media: CMedia;
+    type: 'Poster' | 'Thumbnail';
 };
 
 const MediaCard = (props: TProps) => {
-    const { serverInfo, media } = props;
+    const { serverInfo, media, type } = props;
 
+    const containerRef = useRef<View | null>(null);
     const [imageFailed, setImageFailed] = useState<boolean>(false);
 
     const theme = useTheme();
 
-    const title = media.Type === EMediaType.Movie ? media.Name
-                : media.Type === EMediaType.Series ? media.Name
-                : media.Type === EMediaType.Episode ? media.Series
-                : media.Type === EMediaType.Audio ? media.Name
-                : 'Unsupported Media Type';
 
-    const subtitle = media.Type === EMediaType.Movie ? media.Year
-                   : media.Type === EMediaType.Series ? `${media.Year}${media.SeriesStatus === ESeriesStatus.Continuing ? ' - Continuing' : ''}`
-                   : media.Type === EMediaType.Episode ? `S${media.Season}:E${media.SeriesEpisode} - ${media.Name}`
-                   : media.Type === EMediaType.Audio ? media.AudioArtists.join(', ')
-                   : 'Unsupported Media Type';
+    const calculatingWidth = Math.min(Dimensions.get('screen').width, Dimensions.get('screen').height / 2, 450);
+    const shortestSide = calculatingWidth * 0.4;
+
+
+    // TODO: This functionality should not be here, MediaCard should not know anything of what image to load.
+    const imageUrl =
+        media.type === EMediaType.Episode && type === 'Poster' ? `${serverInfo.address}/Items/${(media as CEpisode).seriesId}/Images/Primary` :
+        `${serverInfo.address}/Items/${media.id}/Images/Primary`;
+
 
     const handleOnError = () => {
         setImageFailed(true);
     };
 
+    const handleLayout = (event: LayoutChangeEvent) => {
+        containerRef.current?.setNativeProps({ style: { width: event.nativeEvent.layout.width } });
+    };
+
+
     return (
-        <View style={styles.card} key={`${media.Id}${media.Name}`}>
-            <View style={styles.header}>
+        <View key={`${media.id}${media.name}`} style={styles.container} ref={containerRef}>
+            <View
+                style={[
+                    { aspectRatio: type === 'Poster' ? 0.67/1 : 16/9 },
+                    type === 'Poster' ? { width: shortestSide * 1.1 } : { height: shortestSide }, // Make posters slightly larger
+                    styles.imageContainer
+                ]}
+                onLayout={handleLayout}
+            >
                 {/* TODO: Add multiple source uris */}
-                <Image
-                    style={[imageFailed ? { display: 'none' } : null, styles.cover]}
-                    source={{ uri: `${serverInfo.address}/Items/${media.Id}/Images/Primary` }}
-                    resizeMode='cover'
-                    onError={handleOnError}
-                />
+                {imageFailed === false && (
+                    <Image
+                        style={styles.image}
+                        source={{ uri: imageUrl }}
+                        resizeMode='cover'
+                        onError={handleOnError}
+                    />
+                )}
 
-                <View style={[imageFailed ? null : { display: 'none' }, { backgroundColor: theme.colors.primaryContainer }, styles.cover, styles.fallback]}>
-                    <Text numberOfLines={3} style={styles.fallbackText}>{title.toUpperCase()}</Text>
-                </View>
+                {imageFailed && (
+                    <View style={[ { backgroundColor: theme.colors.primaryContainer }, styles.image, styles.fallbackContainer ]}>
+                        <Text numberOfLines={3} style={styles.fallbackText}>{media.title.toUpperCase()}</Text>
+                    </View>
+                )}
 
-                {isFinite(media.PlayedPercentage) && (
-                    <ProgressBar style={styles.progressBar} progress={media.PlayedPercentage / 100} />
+                {(isFinite(media.playedPercentage) && media.playedPercentage > 0) && (
+                    <ProgressBar style={styles.progressBar} progress={media.playedPercentage / 100} />
                 )}
             </View>
 
-            <View style={styles.text}>
-                <Text style={styles.title} numberOfLines={1}>{title}</Text>
-                <Text style={styles.subtitle} numberOfLines={1}>{subtitle}</Text>
+            <View style={styles.textContainer}>
+                <Text style={styles.title} numberOfLines={1}>{media.title}</Text>
+                <Text style={styles.subtitle} numberOfLines={1}>{media.subtitle}</Text>
             </View>
         </View>
     );
 };
 
-const screenWidth = Math.min(Dimensions.get('screen').width, Dimensions.get('screen').height / 2, 450);
-
 const styles = StyleSheet.create({
-    card: {
-        width: screenWidth * 0.72,
+    container: {
+        flex: 1,
+        resizeMode: 'contain',
         backgroundColor: 'transparent'
     },
-    header: {
-        height: screenWidth * 0.405,
+    imageContainer: {
+        flex: 1,
         borderRadius: 12,
         overflow: 'hidden'
     },
-    cover: {
-        flex: 1
+    image: {
+        flex: 1,
+        resizeMode: 'contain'
     },
-    fallback: {
+    fallbackContainer: {
         padding: 12,
         alignItems: 'center',
         justifyContent: 'center'
@@ -93,7 +110,7 @@ const styles = StyleSheet.create({
         height: 5,
         opacity: 0.8
     },
-    text: {
+    textContainer: {
         paddingTop: 4
     },
     title: {

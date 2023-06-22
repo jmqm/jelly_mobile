@@ -4,12 +4,12 @@ import MediaCard from 'src/components/MediaCard';
 import useServerInfo from 'src/providers/server/useServerInfo';
 import SectionContainer from 'src/screens/home/SectionContainer';
 import { GetNextUp } from 'src/services/JellyfinAPI';
-import TMedia from 'src/types/JellyfinAPI/TMedia';
+import CMedia from 'src/types/JellyfinAPI/media/CMedia';
 
 const NextUpComponent = () => {
     const { serverInfo } = useServerInfo();
 
-    const [nextUp, setNextUp] = useState<TMedia[]>([]);
+    const [nextUp, setNextUp] = useState<CMedia[]>([]);
 
     useEffect(() => {
         const load = async () => {
@@ -29,7 +29,7 @@ const NextUpComponent = () => {
                 bounces={false}
                 data={nextUp}
                 style={styles.flatList}
-                renderItem={({ item }) => <MediaCard serverInfo={serverInfo} media={item} />}
+                renderItem={({ item }) => <MediaCard serverInfo={serverInfo} media={item} type='Thumbnail' />}
                 ItemSeparatorComponent={() => <View style={{ marginLeft: 16 }} />}
             />
         </SectionContainer>
