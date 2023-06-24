@@ -1,7 +1,6 @@
 import { ReactElement, memo, useEffect, useState } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 import MediaCard from 'src/components/MediaCard';
-import ELibraryType from 'src/enums/ELibraryType';
 import useServerInfo from 'src/providers/server/useServerInfo';
 import SectionContainer from 'src/screens/home/SectionContainer';
 import { GetUserLibraries, GetUserLibraryLatest } from 'src/services/JellyfinAPI';
@@ -13,15 +12,10 @@ const LatestMediaComponent = () => {
     const [userLibraries, setUserLibraries] = useState<TLibrary[]>([]);
     const [latestMediaComponents, setLatestMediaComponents] = useState<ReactElement[]>([]);
 
-    const excludedTypes = [ELibraryType.MusicPlaylist, ELibraryType.LiveTv, ELibraryType.Collection, ELibraryType.Channels, ELibraryType.Music];
-
     // Get user libraries
     useEffect(() => {
         const load = async () => {
-            const unfilteredUserLibraries = await GetUserLibraries(serverInfo);
-            const filteredUserLibraries = unfilteredUserLibraries.filter(i => excludedTypes.includes(i.Type) === false);
-
-            setUserLibraries(filteredUserLibraries);
+            setUserLibraries(await GetUserLibraries(serverInfo));
         };
 
         load();

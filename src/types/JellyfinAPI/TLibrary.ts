@@ -13,11 +13,11 @@ export const ConvertToTLibrary = (json?: any): TLibrary[] => {
         return [];
     }
 
-    return json.Items.map((item: any) => {
+    return json.map((item: any) => {
         return {
-            Name: item.Name ?? 'Name Unknown',
-            Id: item.Id ?? 'Id Unknown',
-            Type: item.CollectionType ?? 'Type Unknown'
+            Name: item.Name,
+            Id: item.Id,
+            Type: item.CollectionType ?? ELibraryType.Unknown
         } as TLibrary;
     });
 };

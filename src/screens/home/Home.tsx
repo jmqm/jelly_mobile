@@ -23,8 +23,8 @@ const HomeScreen = () => {
     }, []);
 
     return (
-        <ScrollView style={[{ marginTop: useSafeAreaInsets().top }, styles.main]}>
-            <Button onPress={onDelete}>Clear server info</Button>
+        <ScrollView style={{ marginTop: useSafeAreaInsets().top }} contentContainerStyle={styles.container}>
+            {/* <Button onPress={onDelete}>Clear server info</Button> */}
 
             {/* TODO: Look at Jellyfin Vue, copy the top banner, maybe copy that to all sections */}
 
@@ -40,14 +40,9 @@ const HomeScreen = () => {
 };
 
 const styles = StyleSheet.create({
-    main: {
+    container: {
+        paddingTop: 16,
         paddingHorizontal: 16
-    },
-    section: {
-        paddingBottom: 16
-    },
-    title: {
-        paddingBottom: 8
     }
 });
 

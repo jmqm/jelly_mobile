@@ -5,7 +5,9 @@ enum ELibraryType {
     Music = 'music',
     Collection = 'boxsets',
     LiveTv = 'livetv',
-    Channels = 'channels'
+    Channels = 'channels',
+
+    Unknown = 'unknown'
 };
 
 export default ELibraryType;

@@ -7,6 +7,7 @@ import * as Device from 'expo-device';
 import EHomeSection from 'src/enums/EHomeSection';
 import TLibrary, { ConvertToTLibrary } from 'src/types/JellyfinAPI/TLibrary';
 import CMedia from 'src/types/JellyfinAPI/media/CMedia';
+import ELibraryType from 'src/enums/ELibraryType';
 
 // https://api.jellyfin.org/
 // https://demo.jellyfin.org/stable/api-docs/swagger/index.html (better)
@@ -95,6 +96,8 @@ export const GetHomeSectionOrder = async (serverInfo: TServerInfo): Promise<EHom
 
 export const GetUserLibraries = async (serverInfo: TServerInfo): Promise<TLibrary[]> => {
     try {
+        const excludedTypes = [ELibraryType.MusicPlaylist, ELibraryType.LiveTv, ELibraryType.Collection, ELibraryType.Channels, ELibraryType.Music];
+
         const response = await fetch(`${serverInfo.address}/Users/${serverInfo.userId}/Views`, {
             headers: {
                 ...GenerateAuthorizationHeader(serverInfo)
@@ -104,7 +107,9 @@ export const GetUserLibraries = async (serverInfo: TServerInfo): Promise<TLibrar
         const data = await response.text();
         const dataJson = JSON.parse(data);
 
-        return ConvertToTLibrary(dataJson);
+        const unfilteredUserLibraries = ConvertToTLibrary(dataJson.Items);
+
+        return unfilteredUserLibraries.filter((library) => excludedTypes.includes(library.Type) === false);
     } catch (error) {
         console.log(`${GetUserLibraries.name} exception: ${error}`);
     }

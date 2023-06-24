@@ -29,7 +29,7 @@ class CMedia {
         this.description = json.Overview;
         this.id = json.Id;
         this.year = json.ProductionYear;
-        this.playedPercentage = json.UserData.PlayedPercentage ?? 0;
+        this.playedPercentage = json.UserData.PlayedPercentage ?? null;
     }
 
     //#endregion
