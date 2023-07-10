@@ -1,8 +1,8 @@
-import { memo, useEffect, useState } from 'react';
-import { FlatList, View, StyleSheet } from 'react-native';
-import MediaCard from 'src/components/MediaCard';
+import { useEffect, useState } from 'react';
+import OpacityAnimationComponent from 'src/components/animations/OpacityAnimation';
 import useServerInfo from 'src/providers/server/useServerInfo';
 import SectionContainer from 'src/screens/home/SectionContainer';
+import SectionFlatList from 'src/screens/home/SectionFlatList';
 import { GetNextUp } from 'src/services/JellyfinAPI';
 import CMedia from 'src/types/JellyfinAPI/media/CMedia';
 
@@ -23,23 +23,16 @@ const NextUpComponent = () => {
     }, []);
 
     return (
-        <SectionContainer title='Next Up'>
-            <FlatList
-                horizontal={true}
-                bounces={false}
-                data={nextUp}
-                style={styles.flatList}
-                renderItem={({ item }) => <MediaCard serverInfo={serverInfo} media={item} type='Thumbnail' />}
-                ItemSeparatorComponent={() => <View style={{ marginLeft: 16 }} />}
-            />
-        </SectionContainer>
+        <>
+            {nextUp.length > 0 && (
+                <OpacityAnimationComponent>
+                    <SectionContainer title='Next Up'>
+                        <SectionFlatList data={nextUp} imageType='Thumbnail' />
+                    </SectionContainer>
+                </OpacityAnimationComponent>
+            )}
+        </>
     );
 };
 
-const styles = StyleSheet.create({
-    flatList: {
-        paddingBottom: 8
-    }
-});
-
-export default memo(NextUpComponent);
+export default NextUpComponent;

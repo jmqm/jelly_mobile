@@ -1,8 +1,8 @@
-import { memo, useEffect, useState } from 'react';
-import { FlatList, View, StyleSheet } from 'react-native';
-import MediaCard from 'src/components/MediaCard';
+import { useEffect, useState } from 'react';
+import OpacityAnimationComponent from 'src/components/animations/OpacityAnimation';
 import useServerInfo from 'src/providers/server/useServerInfo';
 import SectionContainer from 'src/screens/home/SectionContainer';
+import SectionFlatList from 'src/screens/home/SectionFlatList';
 import { GetContinueWatching } from 'src/services/JellyfinAPI';
 import CMedia from 'src/types/JellyfinAPI/media/CMedia';
 
@@ -20,23 +20,16 @@ const ContinueWatchingComponent = () => {
     }, []);
 
     return (
-        <SectionContainer title='Continue Watching'>
-            <FlatList
-                horizontal={true}
-                bounces={false}
-                data={continueWatching}
-                style={styles.flatList}
-                renderItem={({ item }) => <MediaCard serverInfo={serverInfo} media={item} type='Thumbnail' />}
-                ItemSeparatorComponent={() => <View style={{ marginLeft: 16 }} />}
-            />
-        </SectionContainer>
+        <>
+            {continueWatching.length > 0 && (
+                <OpacityAnimationComponent>
+                    <SectionContainer title='Continue Watching'>
+                        <SectionFlatList data={continueWatching} imageType='Thumbnail' />
+                    </SectionContainer>
+                </OpacityAnimationComponent>
+            )}
+        </>
     );
 };
 
-const styles = StyleSheet.create({
-    flatList: {
-        paddingBottom: 8
-    }
-});
-
-export default memo(ContinueWatchingComponent);
+export default ContinueWatchingComponent;

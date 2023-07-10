@@ -91,7 +91,7 @@ export const GetHomeSectionOrder = async (serverInfo: TServerInfo): Promise<EHom
         console.log(`${GetHomeSectionOrder.name} exception: ${error}`);
     }
 
-    return [ ];
+    return [];
 };
 
 export const GetUserLibraries = async (serverInfo: TServerInfo): Promise<TLibrary[]> => {
@@ -132,6 +132,26 @@ export const GetUserLibraryLatest = async (serverInfo: TServerInfo, libraryId: s
         return dataJson.map((item: any) => CMedia.createInstance(item));
     } catch (error) {
         console.log(`${GetUserLibraryLatest.name} exception: ${error}`);
+    }
+
+    return [];
+};
+
+export const GetUserLibraryItems = async (serverInfo: TServerInfo, libraryId: string): Promise<CMedia[]> => {
+    try {
+        const response = await fetch(`${serverInfo.address}/Users/${serverInfo.userId}/Items` +
+                                     `?ParentId=${libraryId}`, {
+            headers: {
+                ...GenerateAuthorizationHeader(serverInfo)
+            }
+        });
+
+        const data = await response.text();
+        const dataJson = JSON.parse(data);
+
+        return dataJson.Items.map((item: any) => CMedia.createInstance(item));
+    } catch (error) {
+        console.log(`${GetUserLibraryItems.name} exception: ${error}`);
     }
 
     return [];

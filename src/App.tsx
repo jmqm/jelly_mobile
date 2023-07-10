@@ -1,10 +1,13 @@
+import { NavigationContainer } from '@react-navigation/native';
 import { registerRootComponent } from 'expo';
-import MainNavigator from 'src/navigators/MainNavigator';
+import MainNavigation from 'src/navigation/MainNavigation';
 import Providers from 'src/providers/Providers';
 
 const App = () => (
     <Providers>
-        <MainNavigator />
+        <NavigationContainer>
+            <MainNavigation />
+        </NavigationContainer>
     </Providers>
 );
 

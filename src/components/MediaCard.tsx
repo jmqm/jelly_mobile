@@ -1,80 +1,86 @@
-import { useRef, useState } from 'react';
-import { View, Image, StyleSheet, Dimensions, LayoutChangeEvent } from 'react-native';
+import { useState } from 'react';
+import { TouchableHighlight } from 'react-native';
+import { View, StyleSheet, LayoutChangeEvent } from 'react-native';
 import { Text, ProgressBar, useTheme } from 'react-native-paper';
+import { Image } from 'react-native-expo-image-cache';
 import EMediaType from 'src/enums/EMediaType';
+import useServerInfo from 'src/providers/server/useServerInfo';
 import CEpisode from 'src/types/JellyfinAPI/media/CEpisode';
 import CMedia from 'src/types/JellyfinAPI/media/CMedia';
-import TServerInfo from 'src/types/server/TServerInfo';
+import { getRecommendedPosterWidthSize, getRecommendedThumbnailWidthSize } from 'src/utilities/Media';
+import MediaConstants from 'src/constants/Media';
 
 type TProps = {
-    serverInfo: TServerInfo;
     media: CMedia;
     type: 'Poster' | 'Thumbnail';
+    hideText?: boolean;
+
+    onPress?(): void;
+    onLayout?(event: LayoutChangeEvent): void;
 };
 
 const MediaCard = (props: TProps) => {
-    const { serverInfo, media, type } = props;
+    const { serverInfo } = useServerInfo();
+    const { media, type, hideText, onPress, onLayout } = props;
 
-    const containerRef = useRef<View | null>(null);
     const [imageFailed, setImageFailed] = useState<boolean>(false);
 
     const theme = useTheme();
 
 
-    const calculatingWidth = Math.min(Dimensions.get('screen').width, Dimensions.get('screen').height / 2, 450);
-    const shortestSide = calculatingWidth * 0.4;
+    const imageSideSize = type === 'Poster' ? getRecommendedPosterWidthSize()
+        : getRecommendedThumbnailWidthSize();
 
 
     // TODO: This functionality should not be here, MediaCard should not know anything of what image to load.
     const imageUrl =
-        media.type === EMediaType.Episode && type === 'Poster' ? `${serverInfo.address}/Items/${(media as CEpisode).seriesId}/Images/Primary` :
-        `${serverInfo.address}/Items/${media.id}/Images/Primary`;
+        media.type === EMediaType.Episode && type === 'Poster' ? `${serverInfo.address}/Items/${(media as CEpisode).seriesId}/Images/Primary?quality=60` :
+        `${serverInfo.address}/Items/${media.id}/Images/Primary?quality=60`;
 
 
     const handleOnError = () => {
         setImageFailed(true);
     };
 
-    const handleLayout = (event: LayoutChangeEvent) => {
-        containerRef.current?.setNativeProps({ style: { width: event.nativeEvent.layout.width } });
-    };
-
 
     return (
-        <View key={`${media.id}${media.name}`} style={styles.container} ref={containerRef}>
-            <View
-                style={[
-                    { aspectRatio: type === 'Poster' ? 0.67/1 : 16/9 },
-                    type === 'Poster' ? { width: shortestSide * 1.1 } : { height: shortestSide }, // Make posters slightly larger
-                    styles.imageContainer
-                ]}
-                onLayout={handleLayout}
-            >
-                {/* TODO: Add multiple source uris */}
-                {imageFailed === false && (
-                    <Image
-                        style={styles.image}
-                        source={{ uri: imageUrl }}
-                        resizeMode='cover'
-                        onError={handleOnError}
-                    />
-                )}
+        <View style={[{ width: imageSideSize }, styles.container]} onLayout={onLayout}>
+            <TouchableHighlight onPress={onPress} style={styles.imageContainer}>
+                <View
+                    style={[
+                        { aspectRatio: type === 'Poster' ? MediaConstants.poster.ratio : MediaConstants.thumbnail.ratio },
+                        { width: imageSideSize },
+                        styles.imageContainer
+                    ]}
+                >
+                    {/* TODO: Add multiple source uris */}
+                    {imageFailed === false && (
+                        <Image
+                            uri={imageUrl}
+                            style={styles.image}
+                            transitionDuration={100}
+                            onError={handleOnError}
+                        />
+                    )}
 
-                {imageFailed && (
-                    <View style={[ { backgroundColor: theme.colors.primaryContainer }, styles.image, styles.fallbackContainer ]}>
-                        <Text numberOfLines={3} style={styles.fallbackText}>{media.title.toUpperCase()}</Text>
-                    </View>
-                )}
+                    {imageFailed && (
+                        <View style={[ { backgroundColor: theme.colors.primaryContainer }, styles.image, styles.fallbackContainer ]}>
+                            <Text numberOfLines={3} style={styles.fallbackText}>{media.title.toUpperCase()}</Text>
+                        </View>
+                    )}
 
-                {(isFinite(media.playedPercentage) && media.playedPercentage > 0) && (
-                    <ProgressBar style={styles.progressBar} progress={media.playedPercentage / 100} />
-                )}
-            </View>
+                    {isFinite(media.playedPercentage) && media.playedPercentage > 0 && (
+                        <ProgressBar style={styles.progressBar} progress={media.playedPercentage / 100} />
+                    )}
+                </View>
+            </TouchableHighlight>
 
-            <View style={styles.textContainer}>
-                <Text style={styles.title} numberOfLines={1}>{media.title}</Text>
-                <Text style={styles.subtitle} numberOfLines={1}>{media.subtitle}</Text>
-            </View>
+            {!hideText && (
+                <View style={styles.textContainer}>
+                    <Text style={styles.title} numberOfLines={1}>{media.title}</Text>
+                    <Text style={styles.subtitle} numberOfLines={1}>{media.subtitle}</Text>
+                </View>
+            )}
         </View>
     );
 };
@@ -92,7 +98,7 @@ const styles = StyleSheet.create({
     },
     image: {
         flex: 1,
-        resizeMode: 'contain'
+        resizeMode: 'cover'
     },
     fallbackContainer: {
         padding: 12,

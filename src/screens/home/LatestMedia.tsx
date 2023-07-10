@@ -1,66 +1,58 @@
-import { ReactElement, memo, useEffect, useState } from 'react';
+import { ReactElement, useEffect, useState } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
-import MediaCard from 'src/components/MediaCard';
+import OpacityAnimationComponent from 'src/components/animations/OpacityAnimation';
 import useServerInfo from 'src/providers/server/useServerInfo';
 import SectionContainer from 'src/screens/home/SectionContainer';
+import SectionFlatList from 'src/screens/home/SectionFlatList';
 import { GetUserLibraries, GetUserLibraryLatest } from 'src/services/JellyfinAPI';
-import TLibrary from 'src/types/JellyfinAPI/TLibrary';
 
 const LatestMediaComponent = () => {
     const { serverInfo } = useServerInfo();
 
-    const [userLibraries, setUserLibraries] = useState<TLibrary[]>([]);
     const [latestMediaComponents, setLatestMediaComponents] = useState<ReactElement[]>([]);
 
-    // Get user libraries
+    const renderItem = ({ item }: { item: ReactElement }) => (item);
+
     useEffect(() => {
         const load = async () => {
-            setUserLibraries(await GetUserLibraries(serverInfo));
+            const userLibraries = await GetUserLibraries(serverInfo);
+
+            setLatestMediaComponents(await Promise.all(userLibraries.map(async (library) => {
+                const title = `Latest ${library.Name}`;
+                const data = await GetUserLibraryLatest(serverInfo, library.Id);
+
+                return (
+                    <SectionContainer title={title} key={title}>
+                        <SectionFlatList data={data} imageType='Poster' />
+                    </SectionContainer>
+                );
+            })));
         };
 
         load();
     }, []);
 
-    // Load latests
-    useEffect(() => {
-        if (userLibraries.length > 0) {
-            const load = async () => {
-                const components = await Promise.all(userLibraries.map(async (library) => {
-                    const title = `Latest ${library.Name}`;
-                    const data = await GetUserLibraryLatest(serverInfo, library.Id);
-
-                    return (
-                        <SectionContainer title={title} key={title}>
-                            <FlatList
-                                horizontal={true}
-                                bounces={false}
-                                data={data}
-                                style={styles.flatList}
-                                renderItem={({ item }) => <MediaCard serverInfo={serverInfo} media={item} type='Poster' />}
-                                ItemSeparatorComponent={() => <View style={{ marginLeft: 16 }} />}
-                            />
-                        </SectionContainer>
-                    );
-                }));
-
-                setLatestMediaComponents(components);
-            };
-
-            load();
-        }
-    }, [userLibraries]);
-
     return (
         <>
-            {latestMediaComponents.length > 0 && latestMediaComponents.map((LatestMediaComponent) => LatestMediaComponent)}
+            {latestMediaComponents.length > 0 && (
+                <OpacityAnimationComponent>
+                    <View style={styles.main}>
+                        <FlatList
+                            data={latestMediaComponents}
+                            renderItem={renderItem}
+                            scrollEnabled={false}
+                        />
+                    </View>
+                </OpacityAnimationComponent>
+            )}
         </>
     );
 };
 
 const styles = StyleSheet.create({
-    flatList: {
-        paddingBottom: 8
+    main: {
+        flex: 1
     }
 });
 
-export default memo(LatestMediaComponent);
+export default LatestMediaComponent;

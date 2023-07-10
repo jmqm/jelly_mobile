@@ -1,46 +1,57 @@
-import { StyleSheet, ScrollView } from 'react-native';
-import { Button } from 'react-native-paper';
+import { StyleSheet, View } from 'react-native';
 import useServerInfo from 'src/providers/server/useServerInfo';
-import { Fragment, useEffect, useState } from 'react';
+import { Fragment, ReactElement, useEffect, useState } from 'react';
 import { GetHomeSectionOrder } from 'src/services/JellyfinAPI';
 import EHomeSection from 'src/enums/EHomeSection';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ContinueWatching from 'src/screens/home/ContinueWatching';
 import NextUp from 'src/screens/home/NextUp';
 import LatestMedia from 'src/screens/home/LatestMedia';
+import { FlashList } from '@shopify/flash-list';
 
 const HomeScreen = () => {
-    const { serverInfo, onDelete } = useServerInfo();
+    const { serverInfo } = useServerInfo();
 
-    const [displayOrder, setDisplayOrder] = useState<EHomeSection[]>();
+    const [sectionComponents, setSectionComponents] = useState<ReactElement[] | null>(null);
+
+    const renderItem = ({ item }: { item: ReactElement }) => (item);
 
     useEffect(() => {
         const load = async () => {
-            setDisplayOrder(await GetHomeSectionOrder(serverInfo));
+            const displayOrder = await GetHomeSectionOrder(serverInfo);
+
+            setSectionComponents(displayOrder && displayOrder.map((section) => (
+                <Fragment key={section}>
+                    {section === EHomeSection.ContinueWatching && <ContinueWatching />}
+                    {section === EHomeSection.NextUp && <NextUp />}
+                    {section === EHomeSection.LatestMedia && <LatestMedia />}
+                </Fragment>
+            )));
         };
 
         load();
     }, []);
 
     return (
-        <ScrollView style={{ marginTop: useSafeAreaInsets().top }} contentContainerStyle={styles.container}>
+        <View style={[{ marginTop: useSafeAreaInsets().top }, styles.container]}>
             {/* <Button onPress={onDelete}>Clear server info</Button> */}
 
             {/* TODO: Look at Jellyfin Vue, copy the top banner, maybe copy that to all sections */}
 
-            {displayOrder && displayOrder.map((section) => (
-                <Fragment key={section}>
-                    {section === EHomeSection.ContinueWatching && <ContinueWatching />}
-                    {section === EHomeSection.NextUp && <NextUp />}
-                    {section === EHomeSection.LatestMedia && <LatestMedia />}
-                </Fragment>
-            ))}
-        </ScrollView>
+            <FlashList
+                data={sectionComponents}
+                renderItem={renderItem}
+                estimatedItemSize={213}
+                showsVerticalScrollIndicator={false}
+            />
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
+        flex: 1,
+        minHeight: 2,
         paddingTop: 16,
         paddingHorizontal: 16
     }

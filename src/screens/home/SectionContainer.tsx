@@ -1,13 +1,14 @@
 import { PropsWithChildren } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, StyleProp, ViewStyle } from 'react-native';
 import { Title } from 'react-native-paper';
 
 type TProps = {
     title: string;
+    style?: StyleProp<ViewStyle>
 };
 
 const SectionContainerComponent = (props: PropsWithChildren<TProps>) => {
-    const { title, children } = props;
+    const { title, style: propStyle, children } = props;
 
     const insertSpaces = (string: string) => {
         return string.replace(/([a-z])([A-Z])/g, '$1 $2')
@@ -15,7 +16,7 @@ const SectionContainerComponent = (props: PropsWithChildren<TProps>) => {
     };
 
     return (
-        <View style={styles.section}>
+        <View style={[propStyle, styles.section]}>
             <Title style={styles.title}>{insertSpaces(title)}</Title>
 
             {children}
