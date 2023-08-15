@@ -24,6 +24,7 @@
     "noEmit": true,
 
     "allowJs": true,
+    "allowImportingTsExtensions": true,
 
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,

@@ -1,10 +1,13 @@
 import ESeriesStatus from 'src/enums/ESeriesStatus';
+import { GetSeriesSeasonsJson } from 'src/services/JellyfinAPI';
 import CMedia from 'src/types/JellyfinAPI/media/CMedia';
+import CSeason from 'src/types/JellyfinAPI/media/CSeason';
 
 class CSeries extends CMedia {
     //#region Fields
 
     status: ESeriesStatus;
+    seasons: CSeason[];
 
     //#endregion
 
@@ -21,6 +24,27 @@ class CSeries extends CMedia {
         super(json);
 
         this.status = json.Status;
+        this.seasons = [] as CSeason[];
+    }
+
+    //#endregion
+
+    //#region Helpers
+
+    public async getSeasons(): Promise<boolean> {
+        try {
+            const response = await GetSeriesSeasonsJson(this.id);
+
+            if (response.status) {
+                this.seasons = response.json!.Items.map((item: any) => new CSeason(item));
+            }
+
+            return response.status;
+        } catch (error) {
+            console.log(`${this.getSeasons.name} exception: ${error}`);
+        }
+
+        return false;
     }
 
     //#endregion

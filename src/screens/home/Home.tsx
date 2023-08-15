@@ -1,5 +1,4 @@
 import { StyleSheet, View } from 'react-native';
-import useServerInfo from 'src/providers/server/useServerInfo';
 import { Fragment, ReactElement, useEffect, useState } from 'react';
 import { GetHomeSectionOrder } from 'src/services/JellyfinAPI';
 import EHomeSection from 'src/enums/EHomeSection';
@@ -8,17 +7,22 @@ import ContinueWatching from 'src/screens/home/ContinueWatching';
 import NextUp from 'src/screens/home/NextUp';
 import LatestMedia from 'src/screens/home/LatestMedia';
 import { FlashList } from '@shopify/flash-list';
+import TopographyPattern from 'src/components/patterns/TopographyPattern';
 
 const HomeScreen = () => {
-    const { serverInfo } = useServerInfo();
-
     const [sectionComponents, setSectionComponents] = useState<ReactElement[] | null>(null);
+
+
+    const ItemSeparatorComponent = () => (
+        <View style={styles.separator} />
+    );
 
     const renderItem = ({ item }: { item: ReactElement }) => (item);
 
+
     useEffect(() => {
         const load = async () => {
-            const displayOrder = await GetHomeSectionOrder(serverInfo);
+            const displayOrder = await GetHomeSectionOrder();
 
             setSectionComponents(displayOrder && displayOrder.map((section) => (
                 <Fragment key={section}>
@@ -32,28 +36,38 @@ const HomeScreen = () => {
         load();
     }, []);
 
+
     return (
-        <View style={[{ marginTop: useSafeAreaInsets().top }, styles.container]}>
-            {/* <Button onPress={onDelete}>Clear server info</Button> */}
+        <>
+            <TopographyPattern opacity={0.05} />
 
-            {/* TODO: Look at Jellyfin Vue, copy the top banner, maybe copy that to all sections */}
+            <View style={[{ paddingTop: useSafeAreaInsets().top }, styles.container]}>
+                {/* <Button onPress={onDelete}>Clear server info</Button> */}
 
-            <FlashList
-                data={sectionComponents}
-                renderItem={renderItem}
-                estimatedItemSize={213}
-                showsVerticalScrollIndicator={false}
-            />
-        </View>
+                {/* TODO: Look at Jellyfin Vue, copy the top banner, maybe copy that to all sections */}
+
+                <FlashList
+                    data={sectionComponents}
+                    renderItem={renderItem}
+                    estimatedItemSize={213}
+
+                    showsVerticalScrollIndicator={false}
+                    initialScrollIndex={0}
+
+                    ListHeaderComponent={ItemSeparatorComponent}
+                />
+            </View>
+        </>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        minHeight: 2,
-        paddingTop: 16,
-        paddingHorizontal: 16
+        minHeight: 2
+    },
+    separator: {
+        paddingBottom: 16
     }
 });
 

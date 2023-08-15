@@ -6,15 +6,15 @@ class CEpisode extends CMedia {
     seriesName: string;
     seriesId: string;
 
-    season: number;
-    number: number; // Episode number
+    seasonNumber: number;
+    episodeNumber: number;
 
     //#endregion
 
     //#region Properties
 
     public override get title(): string { return this.seriesName.toString(); }
-    public override get subtitle(): string { return `S${this.season}:E${this.number} - ${this.name}`; }
+    public override get subtitle(): string { return this.formattedString(true, true, true); }
 
     //#endregion
 
@@ -26,8 +26,26 @@ class CEpisode extends CMedia {
         this.seriesName = json.SeriesName;
         this.seriesId = json.SeriesId;
 
-        this.season = json.ParentIndexNumber;
-        this.number = json.IndexNumber;
+        this.seasonNumber = json.ParentIndexNumber;
+        this.episodeNumber = json.IndexNumber;
+    }
+
+    //#endregion
+
+    //#region Helper functions
+
+    public formattedString(season: boolean = true, episode: boolean = true, name: boolean = true, separator: string = ' - '): string {
+        let formattedString = name ? this.name : '';
+
+        if (episode && isFinite(this.episodeNumber)) {
+            formattedString = `E${this.episodeNumber}${name ? separator : ''}${formattedString}`;
+        }
+
+        if (season && isFinite(this.seasonNumber)) {
+            formattedString = `S${this.seasonNumber}:${formattedString}`;
+        }
+
+        return formattedString;
     }
 
     //#endregion

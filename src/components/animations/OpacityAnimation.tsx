@@ -1,33 +1,37 @@
 import { PropsWithChildren, useEffect, useRef } from 'react';
-import { Animated, Easing } from 'react-native';
+import { Animated, Easing, ViewProps } from 'react-native';
 
 type TProps = {
     duration?: number;
-} & PropsWithChildren;
+    animate?: boolean;
+} & PropsWithChildren & ViewProps;
 
 const defaults: TProps = {
-    duration: 500
+    duration: 200,
+    animate: true
 };
 
 const OpacityAnimationComponent = (props: TProps) => {
-    const { duration, children } = { ...defaults, ...props };
+    const { duration, animate, style, children } = { ...defaults, ...props };
 
     const animationValue = useRef(new Animated.Value(0)).current;
 
     useEffect(() => {
-        Animated.timing(animationValue, {
+        const animation = Animated.timing(animationValue, {
             toValue: 1,
             duration: duration,
             useNativeDriver: true,
             easing: Easing.linear
-        }).start();
-    }, []);
+        });
+
+        if (animate) {
+            animation.start();
+        }
+    }, [animate]);
 
     return (
         <Animated.View
-            style={{
-                opacity: animationValue
-            }}
+            style={[{ opacity: animationValue }, style]}
         >
             {children}
         </Animated.View>

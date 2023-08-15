@@ -5,14 +5,15 @@ import CMedia from 'src/types/JellyfinAPI/media/CMedia';
 
 type TProps = {
     data: CMedia[];
-    imageType: ComponentProps<typeof MediaCard>['type']
-}
+    imageType: ComponentProps<typeof MediaCard>['type'];
+    onPress?: (item: CMedia) => void;
+};
 
 const SectionFlatListComponent = (props: TProps) => {
-    const { data, imageType } = props;
+    const { data, imageType, onPress } = props;
 
     const renderItem = ({ item }: { item: CMedia }) => (
-        <MediaCard media={item} type={imageType} />
+        <MediaCard media={item} type={imageType} onPress={onPress ? () => onPress(item) : undefined} />
     );
 
     const ItemSeparatorComponent = () => (
@@ -21,11 +22,15 @@ const SectionFlatListComponent = (props: TProps) => {
 
     return (
         <FlatList
-            horizontal={true}
-            bounces={false}
             data={data}
             style={styles.flatList}
             renderItem={renderItem}
+
+            horizontal={true}
+            bounces={false}
+
+            ListHeaderComponent={ItemSeparatorComponent}
+            ListFooterComponent={ItemSeparatorComponent}
             ItemSeparatorComponent={ItemSeparatorComponent}
         />
     );

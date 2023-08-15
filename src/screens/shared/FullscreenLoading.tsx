@@ -1,21 +1,25 @@
-import { StyleSheet, View, Dimensions } from 'react-native';
+import { Dimensions, StyleSheet, View } from 'react-native';
 import { ActivityIndicator } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Background from 'src/components/styled/Background';
 
 const FullscreenLoadingScreen = () => {
+    const { width, height } = Dimensions.get('window');
+
     return (
-        <View style={[{ paddingTop: useSafeAreaInsets().top }, styles.loading ]}>
-            <ActivityIndicator animating={true} size='large' />
-        </View>
+        <>
+            <Background />
+
+            <View style={[{ paddingTop: useSafeAreaInsets().top }, { width: width, height: height }, styles.loading ]}>
+                <ActivityIndicator animating={true} size='large' />
+            </View>
+        </>
     );
 };
 
 const styles = StyleSheet.create({
     loading: {
         position: 'absolute',
-        width: Dimensions.get('screen').width,
-        height: Dimensions.get('screen').height,
-
         alignItems: 'center',
         justifyContent: 'center'
     }

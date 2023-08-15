@@ -9,7 +9,8 @@ export const getRecommendedPosterWidthSize = () => {
 };
 
 export const getRecommendedThumbnailWidthSize = () => {
-    const recommendedWidth = getRecommendedPosterWidthSize() * 1.584;
+    const windowWidth = Dimensions.get('window').width;
+    const recommendedWidth = windowWidth * 0.577;
 
     return Math.min(recommendedWidth, MediaConstants.thumbnail.maxWidth);
 };

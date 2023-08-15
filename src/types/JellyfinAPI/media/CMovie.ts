@@ -3,7 +3,7 @@ import CMedia from 'src/types/JellyfinAPI/media/CMedia';
 class CMovie extends CMedia {
     //#region Fields
 
-    // No additional fields required.
+    tagline: string;
 
     //#endregion
 
@@ -18,6 +18,8 @@ class CMovie extends CMedia {
 
     constructor(json: any) {
         super(json);
+
+        this.tagline = json.Taglines ? json.Taglines[0] : undefined;
     }
 
     //#endregion

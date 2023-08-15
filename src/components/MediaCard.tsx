@@ -2,13 +2,14 @@ import { useState } from 'react';
 import { TouchableHighlight } from 'react-native';
 import { View, StyleSheet, LayoutChangeEvent } from 'react-native';
 import { Text, ProgressBar, useTheme } from 'react-native-paper';
-import { Image } from 'react-native-expo-image-cache';
+import { Image } from 'expo-image';
 import EMediaType from 'src/enums/EMediaType';
-import useServerInfo from 'src/providers/server/useServerInfo';
+import server$ from 'src/state/server/server$';
 import CEpisode from 'src/types/JellyfinAPI/media/CEpisode';
 import CMedia from 'src/types/JellyfinAPI/media/CMedia';
 import { getRecommendedPosterWidthSize, getRecommendedThumbnailWidthSize } from 'src/utilities/Media';
 import MediaConstants from 'src/constants/Media';
+import CMovie from 'src/types/JellyfinAPI/media/CMovie';
 
 type TProps = {
     media: CMedia;
@@ -20,7 +21,7 @@ type TProps = {
 };
 
 const MediaCard = (props: TProps) => {
-    const { serverInfo } = useServerInfo();
+    const { server } = server$.use();
     const { media, type, hideText, onPress, onLayout } = props;
 
     const [imageFailed, setImageFailed] = useState<boolean>(false);
@@ -34,32 +35,36 @@ const MediaCard = (props: TProps) => {
 
     // TODO: This functionality should not be here, MediaCard should not know anything of what image to load.
     const imageUrl =
-        media.type === EMediaType.Episode && type === 'Poster' ? `${serverInfo.address}/Items/${(media as CEpisode).seriesId}/Images/Primary?quality=60` :
-        `${serverInfo.address}/Items/${media.id}/Images/Primary?quality=60`;
+        media.type === EMediaType.Episode && type === 'Poster' ? `${server.address}/Items/${(media as CEpisode).seriesId}/Images/Primary?quality=60` :
+        media.type === EMediaType.Movie && type === 'Thumbnail' ? `${server.address}/Items/${(media as CMovie).id}/Images/Thumb?quality=60` :
+        `${server.address}/Items/${media.id}/Images/Primary?quality=60`;
 
 
-    const handleOnError = () => {
+    const handleImageOnError = () => {
         setImageFailed(true);
     };
 
 
     return (
         <View style={[{ width: imageSideSize }, styles.container]} onLayout={onLayout}>
-            <TouchableHighlight onPress={onPress} style={styles.imageContainer}>
+            <TouchableHighlight onPress={onPress} style={[styles.imageContainer, { borderRadius: theme.roundness }]}>
                 <View
                     style={[
-                        { aspectRatio: type === 'Poster' ? MediaConstants.poster.ratio : MediaConstants.thumbnail.ratio },
+                        { aspectRatio: type === 'Poster' ? MediaConstants.poster.aspectRatio : MediaConstants.thumbnail.aspectRatio },
                         { width: imageSideSize },
+                        { borderRadius: theme.roundness },
                         styles.imageContainer
                     ]}
                 >
                     {/* TODO: Add multiple source uris */}
                     {imageFailed === false && (
                         <Image
-                            uri={imageUrl}
+                            source={imageUrl}
                             style={styles.image}
-                            transitionDuration={100}
-                            onError={handleOnError}
+                            contentFit='cover'
+                            transition={100}
+                            onError={handleImageOnError}
+                            cachePolicy='memory-disk'
                         />
                     )}
 
@@ -69,8 +74,8 @@ const MediaCard = (props: TProps) => {
                         </View>
                     )}
 
-                    {isFinite(media.playedPercentage) && media.playedPercentage > 0 && (
-                        <ProgressBar style={styles.progressBar} progress={media.playedPercentage / 100} />
+                    {media.userData.watchedPercentage && media.userData.watchedPercentage > 0 && (
+                        <ProgressBar style={styles.progressBar} progress={media.userData.watchedPercentage / 100} />
                     )}
                 </View>
             </TouchableHighlight>
@@ -93,12 +98,10 @@ const styles = StyleSheet.create({
     },
     imageContainer: {
         flex: 1,
-        borderRadius: 12,
         overflow: 'hidden'
     },
     image: {
-        flex: 1,
-        resizeMode: 'cover'
+        flex: 1
     },
     fallbackContainer: {
         padding: 12,

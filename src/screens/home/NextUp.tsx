@@ -1,14 +1,11 @@
 import { useEffect, useState } from 'react';
 import OpacityAnimationComponent from 'src/components/animations/OpacityAnimation';
-import useServerInfo from 'src/providers/server/useServerInfo';
 import SectionContainer from 'src/screens/home/SectionContainer';
 import SectionFlatList from 'src/screens/home/SectionFlatList';
 import { GetNextUp } from 'src/services/JellyfinAPI';
 import CMedia from 'src/types/JellyfinAPI/media/CMedia';
 
 const NextUpComponent = () => {
-    const { serverInfo } = useServerInfo();
-
     const [nextUp, setNextUp] = useState<CMedia[]>([]);
 
     useEffect(() => {
@@ -16,7 +13,7 @@ const NextUpComponent = () => {
             let cutOffDate = new Date();
             cutOffDate = new Date(cutOffDate.setDate(cutOffDate.getDate() - 90));
 
-            setNextUp(await GetNextUp(serverInfo, cutOffDate));
+            setNextUp(await GetNextUp(cutOffDate));
         };
 
         load();

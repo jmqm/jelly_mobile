@@ -29,6 +29,7 @@ const styles = StyleSheet.create({
         paddingBottom: 16
     },
     title: {
+        paddingHorizontal: 16,
         paddingBottom: 8
     }
 });

@@ -10,7 +10,7 @@ const defaults: TProps = {
 };
 
 const DropDownAnimationComponent = (props: TProps) => {
-    const { duration, children } = props ?? defaults;
+    const { duration, children } = { ...defaults, ...props };
 
     const [animationValue] = useState(new Animated.Value(0));
 

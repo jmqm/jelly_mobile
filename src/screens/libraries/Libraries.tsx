@@ -1,25 +1,36 @@
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ReactElement, useEffect, useState } from 'react';
-import { StyleSheet, View, Image, ScrollView, TouchableHighlight } from 'react-native';
+import { StyleSheet, View, Image, TouchableHighlight, ScrollView } from 'react-native';
+import { useTheme } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import useServerInfo from 'src/providers/server/useServerInfo';
+import TopographyPattern from 'src/components/patterns/TopographyPattern';
+import Background from 'src/components/styled/Background';
+import server$ from 'src/state/server/server$';
 import { GetUserLibraries } from 'src/services/JellyfinAPI';
 import TLibrary from 'src/types/JellyfinAPI/TLibrary';
 import type TLibrariesNavigation from 'src/types/navigation/TLibrariesNavigation';
 
 type TProps = {
-    navigation: NativeStackNavigationProp<TLibrariesNavigation>
-}
+
+} & NativeStackScreenProps<TLibrariesNavigation, 'Libraries'>;
 
 const LibrariesScreen = (props: TProps) => {
     const { navigation } = props;
-    const { serverInfo } = useServerInfo();
+    const { server } = server$.use();
 
     const [libraryComponents, setLibraryComponents] = useState<ReactElement[] | null>(null);
 
+    const theme = useTheme();
+
+
+    const handleOnPress = (library: TLibrary) => {
+        navigation.navigate('Library', { id: library.Id, name: library.Name });
+    };
+
+
     useEffect(() => {
         const load = async () => {
-            const userLibraries = await GetUserLibraries(serverInfo);
+            const userLibraries = await GetUserLibraries();
 
             setLibraryComponents(userLibraries.map((library, index) => {
                 return (
@@ -27,10 +38,10 @@ const LibrariesScreen = (props: TProps) => {
                         key={library.Id}
                         style={index !== userLibraries.length - 1 ? styles.libraryPadding : null}
                     >
-                        <TouchableHighlight onPress={() => handleOnPress(library)} style={styles.imageContainer}>
+                        <TouchableHighlight onPress={() => handleOnPress(library)} style={[{ borderRadius: theme.roundness }, styles.imageContainer]}>
                             <Image
                                 style={styles.image}
-                                source={{ uri: `${serverInfo.address}/Items/${library.Id}/Images/Primary?quality=60` }}
+                                source={{ uri: `${server.address}/Items/${library.Id}/Images/Primary?quality=60` }}
                                 resizeMode='cover'
                             />
                         </TouchableHighlight>
@@ -42,26 +53,32 @@ const LibrariesScreen = (props: TProps) => {
         load();
     }, []);
 
-    const handleOnPress = (library: TLibrary) => {
-        navigation.navigate('Library', { id: library.Id, name: library.Name });
-    };
 
     return (
-        <ScrollView style={[{ marginTop: useSafeAreaInsets().top }, styles.containerContent]}>
-            {libraryComponents && libraryComponents.map((library) => library)}
-        </ScrollView>
+        <>
+            <Background />
+            <TopographyPattern />
+
+            <View style={[{ paddingTop: useSafeAreaInsets().top }, styles.main]}>
+                <ScrollView style={styles.scrollView}>
+                    {libraryComponents && libraryComponents.map((library) => library)}
+                </ScrollView>
+            </View>
+        </>
     );
 };
 
 const styles = StyleSheet.create({
-    containerContent: {
+    main: {
+        flex: 1
+    },
+    scrollView: {
         padding: 16
     },
     libraryPadding: {
         paddingBottom: 16
     },
     imageContainer: {
-        borderRadius: 12,
         overflow: 'hidden'
     },
     image: {

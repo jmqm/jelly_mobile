@@ -1,4 +1,5 @@
 import EMediaType from 'src/enums/EMediaType';
+import CUserData from 'src/types/JellyfinAPI/media/CUserData';
 
 class CMedia {
     //#region Fields
@@ -6,17 +7,24 @@ class CMedia {
     type: EMediaType;
 
     name: string;
+    originalName: string;
     description: string;
     id: string;
     year: number;
-    playedPercentage: number;
+
+    runtimeInMinutes: number | null;
+    parentalRating: string;
+    communityRating: number;
+    criticsRating: number;
+
+    userData: CUserData;
 
     //#endregion
 
     //#region Properties
 
     public get title(): string { return this.name; };
-    public get subtitle(): string { return this.year.toString(); };
+    public get subtitle(): string { return this.year?.toString(); };
 
     //#endregion
 
@@ -26,10 +34,20 @@ class CMedia {
         this.type = CMedia.getType(json);
 
         this.name = json.Name;
+        this.originalName = json.OriginalTitle;
         this.description = json.Overview;
         this.id = json.Id;
         this.year = json.ProductionYear;
-        this.playedPercentage = json.UserData.PlayedPercentage ?? null;
+
+        this.runtimeInMinutes = json.RunTimeTicks && json.RunTimeTicks > 0
+            ? Math.round(json.RunTimeTicks / 10000 / 60000)
+            : null;
+
+        this.parentalRating = json.OfficialRating;
+        this.communityRating = json.CommunityRating;
+        this.criticsRating = json.CriticRating;
+
+        this.userData = new CUserData(json);
     }
 
     //#endregion
