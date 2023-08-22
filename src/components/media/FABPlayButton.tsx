@@ -1,6 +1,8 @@
+import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { StyleSheet, LayoutChangeEvent } from 'react-native';
 import { FAB } from 'react-native-paper';
 import CMedia from 'src/types/JellyfinAPI/media/CMedia';
+import TMediaNavigation from 'src/types/navigation/TMediaNavigation';
 
 type TProps = {
     refHeight: (height: number) => void;
@@ -10,13 +12,14 @@ type TProps = {
 const FABPlayButtonComponent = (props: TProps) => {
     const { refHeight, media } = props;
 
+    const navigation: NavigationProp<TMediaNavigation> = useNavigation();
+
     const handleOnLayout = (event: LayoutChangeEvent) => {
         refHeight(event.nativeEvent.layout.height);
     };
 
     const handleOnPress = () => {
-        // TODO: Add playback functionality.
-        console.log(`play ${media.name}`);
+        navigation.navigate('VideoPlayer', { media: media });
     };
 
     return (

@@ -11,6 +11,8 @@ import CMedia from 'src/types/JellyfinAPI/media/CMedia';
 import ELibraryType from 'src/enums/ELibraryType';
 import CSeries from 'src/types/JellyfinAPI/media/CSeries';
 import CSeason from 'src/types/JellyfinAPI/media/CSeason';
+import { DirectPlayDeviceProfile } from 'src/types/JellyfinAPI/device/TDeviceProfile';
+import TStartPlayback, { ConvertToTStartPlayback } from 'src/types/JellyfinAPI/TStartPlayback';
 
 // https://api.jellyfin.org/
 // https://demo.jellyfin.org/stable/api-docs/swagger/index.html (better)
@@ -274,6 +276,89 @@ export const SetMediaFavourite = async (mediaId: string, favourite: boolean): Pr
 
 //#endregion
 
+//#region Playback
+
+export const StartPlayback = async (mediaId: string): Promise<TStartPlayback> => {
+    try {
+        // --- Get transcoding url through playback info ---
+        const profile = DirectPlayDeviceProfile;
+
+        const playbackInfoResponse = await fetch(`${server.address}/Items/${mediaId}/PlaybackInfo` +
+                                     `?UserId=${user.id}` +
+                                     `&StartTimeTicks=${0}` +
+                                     `&IsPlayback=${true}` +
+                                     `&AutoOpenLiveStream=${true}` +
+                                     `&MediaSourceId=${mediaId}` +
+                                     `&MaxStreamingBitrate=${profile.MaxStreamingBitrate}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json', // Without this, will get a 'Network request failed' error.
+                'Accept': 'application/json',
+                ...GenerateAuthorizationHeader()
+            },
+            body: JSON.stringify({
+                UserId: user.id,
+                DeviceProfile: profile
+            })
+        });
+
+        const playbackInfoData = await playbackInfoResponse.text();
+        const playbackInfoDataJson = JSON.parse(playbackInfoData);
+
+        // If transcoding url is provided, use that.
+        if (playbackInfoDataJson.MediaSources && playbackInfoDataJson.MediaSources[0].TranscodingUrl) {
+            return ConvertToTStartPlayback(playbackInfoDataJson);
+        }
+
+
+
+        // --- Use hls stream ---
+    } catch (error) {
+        console.log(`${StartPlayback.name} exception: ${error}`);
+    }
+
+    return {
+        success: false
+    };
+};
+
+export const ReportPlayback = async (type: 'Started' | 'Progress', mediaId: string): Promise<string> => {
+    try {
+        const playbackInfoResponse = await fetch(`${server.address}/Sessions/Playing${type === 'Progress' ? '/Progress' : ''}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json', // Without this, will get a 'Network request failed' error.
+                'Accept': 'application/json',
+                ...GenerateAuthorizationHeader()
+            },
+            body: JSON.stringify({
+                UserId: user.id
+            })
+        });
+
+        const playbackInfoData = await playbackInfoResponse.text();
+        const playbackInfoDataJson = JSON.parse(playbackInfoData);
+
+        if (playbackInfoDataJson.MediaSourcesx[0]?.thing) {
+            console.log('booga');
+        }
+
+        // If transcoding url is provided, use that.
+        if (playbackInfoDataJson.MediaSources && playbackInfoDataJson.MediaSources[0].TranscodingUrl) {
+            return `${server.address}/${playbackInfoDataJson.MediaSources[0].TranscodingUrl}`;
+        }
+
+
+        // --- Use hls stream ---
+    } catch (error) {
+        console.log(`${StartPlayback.name} exception: ${error}`);
+    }
+
+    return '';
+};
+
+//#endregion
+
 //#region Home sections
 
 export const GetContinueWatching = async (): Promise<CMedia[]> => {
@@ -321,7 +406,7 @@ export const GetNextUp = async (cutOffDateTime: Date): Promise<CMedia[]> => {
 
 //#region Miscellaneos
 
-const GenerateAuthorizationHeader = (): object => {
+export const GenerateAuthorizationHeader = (): object => {
     const { user } = user$.get();
 
     const value = 'MediaBrowser' +

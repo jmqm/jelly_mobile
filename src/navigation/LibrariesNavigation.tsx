@@ -6,6 +6,7 @@ import Movie from 'src/screens/media/Movie';
 import Series from 'src/screens/media/Series';
 import Season from 'src/screens/media/Season';
 import Episode from 'src/screens/media/Episode';
+import VideoPlayer from 'src/screens/player/VideoPlayer';
 
 const Stack = createNativeStackNavigator<TLibrariesNavigation>();
 
@@ -24,6 +25,8 @@ const LibrariesNavigation = () => (
         <Stack.Screen name='Series' component={Series} />
         <Stack.Screen name='Season' component={Season} />
         <Stack.Screen name='Episode' component={Episode} />
+
+        <Stack.Screen name='VideoPlayer' component={VideoPlayer} />
     </Stack.Navigator>
 );
 

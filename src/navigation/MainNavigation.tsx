@@ -63,7 +63,7 @@ const MainNavigation = () => {
             }
 
             <Tab.Screen name='LibrariesStack' component={LibrariesNavigation} options={{ title: 'Libraries', tabBarIcon: 'library' }} />
-            <Tab.Screen name='Home' component={Home} options={{ title: 'Home', tabBarIcon: 'home' }} />
+            {/* <Tab.Screen name='Home' component={Home} options={{ title: 'Home', tabBarIcon: 'home' }} /> */}
             <Tab.Screen name='Downloads' component={Downloads} options={{ title: 'Downloads', tabBarIcon: 'download' }} />
 
             {__DEV__ && (
