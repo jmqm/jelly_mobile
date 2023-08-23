@@ -33,6 +33,19 @@
       "eas": {
         "projectId": "568b63d2-fc56-490d-847f-e775917f570e"
       }
-    }
+    },
+    "plugins": [
+      ["expo-screen-orientation", {
+        "initialOrientation": "DEFAULT"
+      }],
+      ["react-native-vlc-media-player", {
+        "ios": {
+            "includeVLCKit": false
+        },
+        "android": {
+            "legacyJetifier": false
+        }
+      }]
+    ]
   }
 }
