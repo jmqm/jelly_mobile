@@ -9,18 +9,34 @@ jobs:
     - name: 🏗 Setup repo
       uses: actions/checkout@v3
 
+    - name: 📔 Hash files for caching
+      uses: seepine/hash-files@v1
+      id: get-hash
+      with:
+        patterns: |
+          **/yarn.lock
+          **/package-lock.json
+    
+    - name: 📔 Cache node modules
+      uses: actions/cache@v3
+      with:
+        path: node_modules
+        key: ${{ runner.os }}-node-${{ steps.get-hash.outputs.hash }}
+        restore-keys: |
+            ${{ runner.OS }}-node-
+
     - name: 🏗 Setup Node
       uses: actions/setup-node@v3
       with:
         node-version: 18
-        cache: yarn
+        #cache: yarn
 
     - name: 🏗 Setup Java
       uses: actions/setup-java@v3
       with:
         distribution: 'temurin'
         java-version: 17
-        cache: yarn
+        #cache: yarn
 
     - name: 🏗 Setup Android SDK
       uses: android-actions/setup-android@v2
@@ -49,7 +65,7 @@ jobs:
           --platform=android \
           --profile=development
 
-    - name: 📱 Upload binary
+    - name: ✈ Upload binary
       uses: actions/upload-artifact@v3
       with:
         name: Android Development Build
