@@ -7,6 +7,10 @@ on: push
     #branches:
       #- main
 
+env:
+  NAME: Jelly Mobile
+  VERSION: 'Unset'
+
 jobs:
   main:
     runs-on: ubuntu-20.04
@@ -20,9 +24,10 @@ jobs:
         # Extract the current date in YYYY.MM format
         YEAR=$(date +"%Y")
         MONTH=$(date +"%m")
-        VERSION="$YEAR.$MONTH.$GITHUB_RUN_NUMBER-dev"
+        echo "VERSION=$YEAR.$MONTH.$GITHUB_RUN_NUMBER-dev" >> $GITHUB_ENV
         sed -i "s/\"version\": \".*\"/\"version\": \"$VERSION\"/" package.json
         sed -i "s/\"version\": \".*\"/\"version\": \"$VERSION\"/" app.json
+        echo "Changed version to ${{ env.VERSION }} in package.json and app.json"
 
     - name: 📔 Hash files for caching
       uses: seepine/hash-files@v1
@@ -76,14 +81,15 @@ jobs:
       run: |
         eas build --local \
           --non-interactive \
-          --output=build/ \
+          --output=build/* \
+          #--output="build/${{ env.NAME }} ${{ env.VERSION }}" \
           --platform=android \
           --profile=development
 
-    - name: ✈ Upload binary
-      uses: actions/upload-artifact@v3
-      with:
-        name: Android Development Build
-        path: build
-        retention-days: 30
+    #- name: ✈ Upload binary
+    #  uses: actions/upload-artifact@v3
+    #  with:
+    #    name: Android Development Build
+    #    path: "build/${{ env.NAME }} ${{ env.VERSION }}"
+    #    retention-days: 30
       
