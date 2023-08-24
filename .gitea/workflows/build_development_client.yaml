@@ -50,8 +50,8 @@ jobs:
           --profile=development
 
     - name: 📱 Upload binary
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: android
-        path: build
+        path: ./build
       
