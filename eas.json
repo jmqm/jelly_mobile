@@ -6,17 +6,39 @@
     "development": {
       "developmentClient": true,
       "distribution": "internal",
+      "cache": {
+        "key": "jelly_mobile_development",
+        "paths": [
+          "./ios/Pods",
+          "./android/.gradle"
+        ]
+      },
       "android": {
         "buildType": "apk"
       }
     },
     "preview": {
       "distribution": "internal",
+      "cache": {
+        "key": "jelly_mobile_preview",
+        "paths": [
+          "./ios/Pods",
+          "./android/.gradle"
+        ]
+      },
       "android": {
         "buildType": "apk"
       }
     },
-    "production": {}
+    "production": {
+      "cache": {
+        "key": "jelly_mobile_production",
+        "paths": [
+          "./ios/Pods",
+          "./android/.gradle"
+        ]
+      }
+    }
   },
   "submit": {
     "production": {}
