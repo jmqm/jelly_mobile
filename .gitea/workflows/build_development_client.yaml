@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
-    - name: 🏗 Setup repo
+    - name: 🏗 Check out repo
       uses: actions/checkout@v3
 
     - name: ✍ Update version number
@@ -25,43 +25,41 @@ jobs:
         sed -i "s/\"version\": \".*\"/\"version\": \"${{ env.VERSION }}\"/" app.json
         echo "Changed version to ${{ env.VERSION }} in package.json and app.json"
 
-    - name: 🏗 Setup Node
+    - name: ⚙ Install Node
       uses: actions/setup-node@v3
       with:
         node-version: 18
 
-    - name: 🏗 Setup Java
+    - name: ⚙ Install Java
       uses: actions/setup-java@v3
       with:
         distribution: 'temurin'
         java-version: 17
 
-    - name: 🏗 Setup Android SDK
+    - name: ⚙ Install Android SDK
       uses: android-actions/setup-android@v2
 
-    - name: 🏗 Setup Expo and EAS
+    - name: ⚙ Install Expo and EAS
       uses: expo/expo-github-action@v7
       with:
         token: ${{ secrets.EXPO_TOKEN }}
         expo-version: latest
         eas-version: latest
 
-    - name: 🏗 Setup EAS local builds
+    - name: ⚙ Install EAS local builds plugin
       run: yarn global add eas-cli-local-build-plugin
 
     - name: 👷 Build app
       run: |
         eas build --local \
           --non-interactive \
-          --output=. \
-          #--output="build/${{ env.NAME }} ${{ env.VERSION }}" \
+          --output="build/${{ env.NAME }} ${{ env.VERSION }}.apk" \
           --platform=android \
           --profile=development
 
-    #- name: ✈ Upload binary
-    #  uses: actions/upload-artifact@v3
-    #  with:
-    #    name: Android Development Build
-    #    path: "build/${{ env.NAME }} ${{ env.VERSION }}"
-    #    retention-days: 30
-      
+    - name: ✈ Upload binary
+      uses: actions/upload-artifact@v3
+      with:
+        name: Android Development Build
+        path: "build/${{ env.NAME }} ${{ env.VERSION }}.apk"
+        retention-days: 30
