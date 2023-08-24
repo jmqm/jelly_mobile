@@ -9,7 +9,7 @@ on: push
 
 env:
   NAME: Jelly Mobile
-  VERSION: 'Unset'
+  #VERSION: 'Unset' # Set in a step
 
 jobs:
   main:
@@ -29,34 +29,32 @@ jobs:
         sed -i "s/\"version\": \".*\"/\"version\": \"$VERSION\"/" app.json
         echo "Changed version to ${{ env.VERSION }} in package.json and app.json"
 
-    - name: 📔 Hash files for caching
-      uses: seepine/hash-files@v1
-      id: get-hash
-      with:
-        patterns: |
-          **/yarn.lock
-          **/package-lock.json
+    #- name: 📔 Hash files for caching
+    #  uses: seepine/hash-files@v1
+    #  id: get-hash
+    #  with:
+    #    patterns: |
+    #      **/yarn.lock
+    #      **/package-lock.json
     
-    - name: 📔 Cache node modules
-      uses: actions/cache@v3
-      with:
-        path: node_modules
-        key: ${{ runner.os }}-node-${{ steps.get-hash.outputs.hash }}
-        restore-keys: |
-            ${{ runner.OS }}-node-
+    #- name: 📔 Cache node modules
+    #  uses: actions/cache@v3
+    #  with:
+    #    path: node_modules
+    #    key: ${{ runner.os }}-node-${{ steps.get-hash.outputs.hash }}
+    #    restore-keys: |
+    #        ${{ runner.OS }}-node-
 
     - name: 🏗 Setup Node
       uses: actions/setup-node@v3
       with:
         node-version: 18
-        #cache: yarn
 
     - name: 🏗 Setup Java
       uses: actions/setup-java@v3
       with:
         distribution: 'temurin'
         java-version: 17
-        #cache: yarn
 
     - name: 🏗 Setup Android SDK
       uses: android-actions/setup-android@v2
@@ -71,17 +69,11 @@ jobs:
     - name: 🏗 Setup EAS local builds
       run: yarn global add eas-cli-local-build-plugin
 
-    - name: 📦 Install dependencies
-      run: yarn
-
-    #- name: 📋 Test project
-    #  run: yarn test
-
     - name: 👷 Build app
       run: |
         eas build --local \
           --non-interactive \
-          --output=build/* \
+          --output=. \
           #--output="build/${{ env.NAME }} ${{ env.VERSION }}" \
           --platform=android \
           --profile=development
