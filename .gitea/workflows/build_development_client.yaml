@@ -9,7 +9,7 @@ on: push
 
 env:
   NAME: Jelly Mobile
-  VERSION: $(date +"%Y").$(date +"%m").${{ GITHUB_RUN_NUMBER }}
+  VERSION: ${{ format('{0}.{1}.${{ GITHUB_RUN_NUMBER }}', formatDateTime(now(), 'yyyy'), formatDateTime(now(), 'MM')) }}
 
 jobs:
   main:
@@ -23,6 +23,7 @@ jobs:
       run: |
         sed -i "s/\"version\": \".*\"/\"version\": \"$VERSION\"/" package.json
         sed -i "s/\"version\": \".*\"/\"version\": \"$VERSION\"/" app.json
+        echo "Changed version to ${{ env.VERSION }} in package.json and app.json"
         echo "Changed version to $VERSION in package.json and app.json"
 
     - name: ⚙ Install Node
