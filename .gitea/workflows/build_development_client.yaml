@@ -9,6 +9,15 @@ jobs:
     - name: 🏗 Setup repo
       uses: actions/checkout@v3
 
+    - name: ✍ Update version number
+      run: |
+        # Extract the current date in YYYY.MM format
+        YEAR=$(date +"%Y")
+        MONTH=$(date +"%m")
+        VERSION="$YEAR.$MONTH.$BUILD_ID-dev"
+        sed -i "s/\"version\": \".*\"/\"version\": \"$VERSION\"/" package.json
+        sed -i "s/\"version\": \".*\"/\"version\": \"$VERSION\"/" app.json
+
     - name: 📔 Hash files for caching
       uses: seepine/hash-files@v1
       id: get-hash
@@ -69,5 +78,5 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: Android Development Build
-        path: build/*
+        path: build/
       
