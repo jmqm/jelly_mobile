@@ -7,9 +7,6 @@ on: push
     #branches:
       #- main
 
-env:
-  NAME: Jelly Mobile
-
 jobs:
   main:
     runs-on: ubuntu-20.04
@@ -20,10 +17,12 @@ jobs:
 
     - name: ✍ Update version number
       run: |
-        sed -i "s/\"version\": \".*\"/\"version\": \"$(date +"%Y").$(date +"%m").${{ GITHUB_RUN_NUMBER }}\"/" package.json
-        sed -i "s/\"version\": \".*\"/\"version\": \"$(date +"%Y").$(date +"%m").${{ GITHUB_RUN_NUMBER }}\"/" app.json
-        echo "Changed version to $(date +"%Y").$(date +"%m").${{ GITHUB_RUN_NUMBER }} in package.json and app.json"
-        echo "${{ env.NAME }}"
+        YEAR=$(date +"%Y")
+        MONTH=$(date +"%m")
+        VERSION="$YEAR.$MONTH.$GITHUB_RUN_NUMBER-dev"
+        sed -i "s/\"version\": \".*\"/\"version\": \"$VERSION\"/" package.json
+        sed -i "s/\"version\": \".*\"/\"version\": \"$VERSION\"/" app.json
+        echo "Changed version to $VERSION in package.json and app.json"
 
     - name: ⚙ Install Node
       uses: actions/setup-node@v3
@@ -46,14 +45,14 @@ jobs:
         expo-version: latest
         eas-version: latest
 
-    - name: ⚙ Install EAS local builds plugin
+    - name: ⚙ Install EAS local builds
       run: yarn global add eas-cli-local-build-plugin
 
     - name: 👷 Build app
       run: |
         eas build --local \
           --non-interactive \
-          --output="build/debug.apk" \
+          --output=build/app-debug.apk \
           --platform=android \
           --profile=development
 
