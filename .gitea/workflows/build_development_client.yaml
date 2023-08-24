@@ -14,7 +14,7 @@ jobs:
         # Extract the current date in YYYY.MM format
         YEAR=$(date +"%Y")
         MONTH=$(date +"%m")
-        VERSION="$YEAR.$MONTH.$BUILD_ID-dev"
+        VERSION="$YEAR.$MONTH.$GITEA_RUN_NUMBER-dev"
         sed -i "s/\"version\": \".*\"/\"version\": \"$VERSION\"/" package.json
         sed -i "s/\"version\": \".*\"/\"version\": \"$VERSION\"/" app.json
 
