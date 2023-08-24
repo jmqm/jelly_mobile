@@ -48,16 +48,18 @@ jobs:
     - name: ⚙ Install EAS local builds
       run: yarn global add eas-cli-local-build-plugin
 
-          #--output="build/app-debug.apk" \
+    - name: ⚙ Install dependencies
+      run: yarn install
+
     - name: 👷 Build app
       run: |
         eas build --local \
           --non-interactive \
-          --output=build \
+          --output="build/app-debug.apk" \
           --platform=android \
           --profile=development
 
-    - name: ✈ Upload binary
+    - name: 📦 Upload binary
       uses: actions/upload-artifact@v3
       with:
         name: Android Development Build
