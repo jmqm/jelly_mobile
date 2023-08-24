@@ -46,6 +46,11 @@
         "android": {
             "legacyJetifier": false
         }
+      }],
+      ["expo-build-properties", {
+        "android": {
+          "compileSdkVersion": 31
+        }
       }]
     ]
   }
