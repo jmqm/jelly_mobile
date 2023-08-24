@@ -9,7 +9,6 @@ on: push
 
 env:
   NAME: Jelly Mobile
-  VERSION: ${{ format('{0}.{1}.${{ GITHUB_RUN_NUMBER }}', formatDateTime(now(), 'yyyy'), formatDateTime(now(), 'MM')) }}
 
 jobs:
   main:
@@ -21,10 +20,10 @@ jobs:
 
     - name: ✍ Update version number
       run: |
-        sed -i "s/\"version\": \".*\"/\"version\": \"$VERSION\"/" package.json
-        sed -i "s/\"version\": \".*\"/\"version\": \"$VERSION\"/" app.json
-        echo "Changed version to ${{ env.VERSION }} in package.json and app.json"
-        echo "Changed version to $VERSION in package.json and app.json"
+        sed -i "s/\"version\": \".*\"/\"version\": \"$(date +"%Y").$(date +"%m").${{ GITHUB_RUN_NUMBER }}\"/" package.json
+        sed -i "s/\"version\": \".*\"/\"version\": \"$(date +"%Y").$(date +"%m").${{ GITHUB_RUN_NUMBER }}\"/" app.json
+        echo "Changed version to $(date +"%Y").$(date +"%m").${{ GITHUB_RUN_NUMBER }} in package.json and app.json"
+        echo "${{ env.NAME }}"
 
     - name: ⚙ Install Node
       uses: actions/setup-node@v3
@@ -54,7 +53,7 @@ jobs:
       run: |
         eas build --local \
           --non-interactive \
-          --output="build/$NAME $VERSION.apk" \
+          --output="build/debug.apk" \
           --platform=android \
           --profile=development
 
@@ -62,5 +61,5 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: Android Development Build
-        path: "build/$NAME $VERSION.apk"
+        path: build
         retention-days: 30
