@@ -21,9 +21,9 @@ jobs:
 
     - name: ✍ Update version number
       run: |
-        sed -i "s/\"version\": \".*\"/\"version\": \"${{ env.VERSION }}\"/" package.json
-        sed -i "s/\"version\": \".*\"/\"version\": \"${{ env.VERSION }}\"/" app.json
-        echo "Changed version to ${{ env.VERSION }} in package.json and app.json"
+        sed -i "s/\"version\": \".*\"/\"version\": \"$VERSION\"/" package.json
+        sed -i "s/\"version\": \".*\"/\"version\": \"$VERSION\"/" app.json
+        echo "Changed version to $VERSION in package.json and app.json"
 
     - name: ⚙ Install Node
       uses: actions/setup-node@v3
@@ -53,7 +53,7 @@ jobs:
       run: |
         eas build --local \
           --non-interactive \
-          --output="build/${{ env.NAME }} ${{ env.VERSION }}.apk" \
+          --output="build/$NAME $VERSION.apk" \
           --platform=android \
           --profile=development
 
@@ -61,5 +61,5 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: Android Development Build
-        path: "build/${{ env.NAME }} ${{ env.VERSION }}.apk"
+        path: "build/$NAME $VERSION.apk"
         retention-days: 30
