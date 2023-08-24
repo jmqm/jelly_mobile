@@ -1,8 +1,14 @@
 name: Build development client
-on: [push]
+on: push
+#on:
+  #pull_request:
+    #types:
+      #- closed
+    #branches:
+      #- main
 
 jobs:
-  build:
+  main:
     runs-on: ubuntu-20.04
 
     steps:
@@ -77,6 +83,6 @@ jobs:
     - name: ✈ Upload binary
       uses: actions/upload-artifact@v3
       with:
-        name: Android Development Build
-        path: build/
+        name: Android Development Build 
+        path: build
       
