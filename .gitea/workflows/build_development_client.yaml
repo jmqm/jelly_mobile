@@ -48,11 +48,11 @@ jobs:
     - name: ⚙ Install EAS local builds
       run: yarn global add eas-cli-local-build-plugin
 
+          #--output="build/app-debug.apk" \
     - name: 👷 Build app
       run: |
         eas build --local \
           --non-interactive \
-          #--output="build/app-debug.apk" \
           --output=build \
           --platform=android \
           --profile=development
