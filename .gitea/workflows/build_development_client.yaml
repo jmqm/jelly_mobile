@@ -24,6 +24,22 @@ jobs:
         sed -i "s/\"version\": \".*\"/\"version\": \"$VERSION\"/" app.json
         echo "Changed version to $VERSION in package.json and app.json"
 
+    - name: 📔 Hash files for caching
+      uses: seepine/hash-files@v1
+      id: get-hash
+      with:
+        patterns: |
+          **/yarn.lock
+          **/package-lock.json
+
+    - name: 📔 Cache node modules
+      uses: actions/cache@v3
+      with:
+        path: node_modules
+        key: ${{ runner.os }}-node-${{ steps.get-hash.outputs.hash }}
+        restore-keys: |
+            ${{ runner.OS }}-node-
+
     - name: ⚙ Install Node
       uses: actions/setup-node@v3
       with:
@@ -50,6 +66,9 @@ jobs:
 
     - name: ⚙ Install dependencies
       run: yarn install
+
+    #- name: 📋 Test project
+    #  run: yarn test
 
     - name: 👷 Build app
       run: |
