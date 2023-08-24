@@ -55,11 +55,12 @@ jobs:
       uses: android-actions/setup-android@v2
 
     - name: ⚙ Install Expo and EAS
-      uses: expo/expo-github-action@v7
+      uses: expo/expo-github-action@v8
       with:
         token: ${{ secrets.EXPO_TOKEN }}
         expo-version: latest
         eas-version: latest
+        packager: yarn
 
     - name: ⚙ Install EAS local builds
       run: yarn global add eas-cli-local-build-plugin
@@ -74,13 +75,13 @@ jobs:
       run: |
         eas build --local \
           --non-interactive \
-          --output="build/app-debug.apk" \
+          --output="app-debug.apk" \
           --platform=android \
           --profile=development
 
     - name: 📦 Upload binary
       uses: actions/upload-artifact@v3
       with:
-        name: Android Development Build
-        path: build
+        name: app-debug.apk
+        path: app-debug.apk
         retention-days: 30
