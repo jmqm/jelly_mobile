@@ -13,14 +13,17 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: 18
-        #cache: yarn
+        cache: yarn
 
     - name: 🏗 Setup Java
       uses: actions/setup-java@v3
       with:
         distribution: 'temurin'
         java-version: 17
-        #cache: yarn
+        cache: yarn
+
+    - name: 🏗 Setup Android SDK
+      uses: android-actions/setup-android@v2
 
     - name: 🏗 Setup Expo and EAS
       uses: expo/expo-github-action@v7
