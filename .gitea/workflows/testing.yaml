@@ -1,0 +1,27 @@
+name: Testing
+on: push
+
+env:
+  NAME: Jelly Mobile
+  #VERSION: Unset # Set in steps below
+
+jobs:
+  main:
+    runs-on: ubuntu-20.04
+
+    steps:
+    - name: Testing
+      run: |
+        YEAR=$(date +"%Y")
+        MONTH=$(date +"%m")
+        echo "VERSION=$YEAR.$MONTH.$GITHUB_RUN_NUMBER-dev" >> $GITHUB_ENV
+        echo "Changed version to ${{ env.VERSION }} in package.json and app.json"
+        echo "VERSION=$YEAR.$MONTH.$GITHUB_RUN_NUMBER-dev" >> $GITEA_ENV
+        echo "Changed version to ${{ env.VERSION }} in package.json and app.json"
+        echo "env: ${{ env }}"
+        echo "env.NAME: ${{ env.NAME }}"
+
+        sed -i "s/\"version\": \".*\"/\"version\": \"$(date +"%Y").$(date +"%m").${{ GITHUB_RUN_NUMBER }}\"/" package.json
+        sed -i "s/\"version\": \".*\"/\"version\": \"$(date +"%Y").$(date +"%m").${{ GITHUB_RUN_NUMBER }}\"/" app.json
+
+        echo "Changed version to $(date +"%Y").$(date +"%m").${{ GITHUB_RUN_NUMBER }} in package.json and app.json"
