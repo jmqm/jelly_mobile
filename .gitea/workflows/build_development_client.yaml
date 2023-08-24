@@ -83,6 +83,6 @@ jobs:
     - name: ✈ Upload binary
       uses: actions/upload-artifact@v3
       with:
-        name: Android Development Build 
+        name: Android Development Build
         path: build
       
