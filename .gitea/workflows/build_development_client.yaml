@@ -9,7 +9,7 @@ on: push
 
 env:
   NAME: Jelly Mobile
-  #VERSION: 'Unset' # Set in a step
+  VERSION: $(date +"%Y").$(date +"%m").${{ GITHUB_RUN_NUMBER }}
 
 jobs:
   main:
@@ -21,29 +21,9 @@ jobs:
 
     - name: ✍ Update version number
       run: |
-        # Extract the current date in YYYY.MM format
-        YEAR=$(date +"%Y")
-        MONTH=$(date +"%m")
-        echo "VERSION=$YEAR.$MONTH.$GITHUB_RUN_NUMBER-dev" >> $GITHUB_ENV
-        sed -i "s/\"version\": \".*\"/\"version\": \"$VERSION\"/" package.json
-        sed -i "s/\"version\": \".*\"/\"version\": \"$VERSION\"/" app.json
+        sed -i "s/\"version\": \".*\"/\"version\": \"${{ env.VERSION }}\"/" package.json
+        sed -i "s/\"version\": \".*\"/\"version\": \"${{ env.VERSION }}\"/" app.json
         echo "Changed version to ${{ env.VERSION }} in package.json and app.json"
-
-    #- name: 📔 Hash files for caching
-    #  uses: seepine/hash-files@v1
-    #  id: get-hash
-    #  with:
-    #    patterns: |
-    #      **/yarn.lock
-    #      **/package-lock.json
-    
-    #- name: 📔 Cache node modules
-    #  uses: actions/cache@v3
-    #  with:
-    #    path: node_modules
-    #    key: ${{ runner.os }}-node-${{ steps.get-hash.outputs.hash }}
-    #    restore-keys: |
-    #        ${{ runner.OS }}-node-
 
     - name: 🏗 Setup Node
       uses: actions/setup-node@v3
