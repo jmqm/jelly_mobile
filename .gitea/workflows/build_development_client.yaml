@@ -1,5 +1,6 @@
 name: Build development client
 on:
+  workflow_dispatch:
   pull_request:
     types:
       - closed
@@ -14,6 +15,42 @@ jobs:
     - name: 🏗 Check out repo
       uses: actions/checkout@v3
 
+    - name: 📁 Cache node_modules global (1/2)
+      id: hash-packages_global
+      uses: theowenyoung/folder-hash@v3
+      with:
+        path: |
+          /usr/local/share/.config/yarn/global
+          /usr/local/lib/node_modules
+
+    - name: 📂 Cache node_modules global (2/2)
+      id: cache-packages_global
+      uses: actions/cache@v3
+      with:
+        path: |
+          /usr/local/share/.config/yarn/global
+          /usr/local/lib/node_modules
+        key: ${{ runner.os }}-packages_global-${{ steps.hash-packages_global.outputs.hash }}
+        restore-keys: |
+            ${{ runner.os }}-packages_global-
+
+    - name: 📁 Cache node_modules (1/2)
+      id: hash-packages
+      uses: seepine/hash-files@v1
+      with:
+        patterns: |
+          **/yarn.lock
+          **/package-lock.json
+
+    - name: 📂 Cache node_modules (2/2)
+      id: cache-packages
+      uses: actions/cache@v3
+      with:
+        path: node_modules
+        key: ${{ runner.os }}-packages-${{ steps.hash-packages.outputs.hash }}
+        restore-keys: |
+            ${{ runner.os }}-packages-
+
     - name: ✍ Update version number
       run: |
         YEAR=$(date +"%Y")
@@ -23,32 +60,16 @@ jobs:
         sed -i "s/\"version\": \".*\"/\"version\": \"$VERSION\"/" app.json
         echo "Changed version to $VERSION in package.json and app.json"
 
-    - name: 📔 Hash files for caching
-      uses: seepine/hash-files@v1
-      id: get-hash
-      with:
-        patterns: |
-          **/yarn.lock
-          **/package-lock.json
-
-    - name: 📔 Cache node modules
-      uses: actions/cache@v3
-      with:
-        path: node_modules
-        key: ${{ runner.os }}-node-${{ steps.get-hash.outputs.hash }}
-        restore-keys: |
-            ${{ runner.OS }}-node-
-
     - name: ⚙ Install Node
       uses: actions/setup-node@v3
       with:
-        node-version: 18
+        node-version: 16
 
     - name: ⚙ Install Java
       uses: actions/setup-java@v3
       with:
         distribution: 'temurin'
-        java-version: 17
+        java-version: 11
 
     - name: ⚙ Install Android SDK
       uses: android-actions/setup-android@v2
@@ -61,26 +82,60 @@ jobs:
         eas-version: latest
         packager: yarn
 
-    - name: ⚙ Install EAS local builds
-      run: yarn global add eas-cli-local-build-plugin
+    - name: ⚙ Install eas-cli-local-build-plugin
+      if: steps.cache-packages_global.outputs.cache-hit != 'true'
+      run: |
+        echo 'node_modules global cache changed'
+        yarn global add eas-cli-local-build-plugin
 
     - name: ⚙ Install dependencies
-      run: yarn install
-
-    #- name: 📋 Test project
-    #  run: yarn test
-
-    - name: 👷 Build app
+      if: steps.cache-packages.outputs.cache-hit != 'true'
       run: |
-        eas build --local \
-          --non-interactive \
-          --output="app-debug.apk" \
-          --platform=android \
-          --profile=development
+        echo 'node_modules cache changed'
+        yarn install
 
-    - name: 📦 Upload binary
+    - name: 📋 Test project'
+      run: |
+        if grep -Ei '"dependencies"\s*:\s*{\s*"jest"' package.json && grep -Ei '"scripts"\s*:\s*{\s*"test"' package.json; then
+          echo 'Running tests'
+          yarn test
+        else
+          echo "Can't run tests; either Jest is not installed or script 'test' was not found."
+        fi
+
+    - name: 👷‍♂️ Build (1/2)
+      run: |
+        npx expo prebuild \
+          --clean \
+          --no-install \
+          --platform android
+
+    - name: 👷‍♂️ Build (2/2)
+      uses: burrunan/gradle-cache-action@v1
+      with:
+        build-root-directory: android
+        gradle-version: wrapper
+        arguments: --build-cache --no-daemon :app:assembleDebug
+
+    - name: '[✖ OBSOLETE] 👷 Build app'
+      if: false
+      run: |
+        eas build \
+          --local \
+          --non-interactive \
+          --platform android \
+          --profile development
+
+    - name: 📦 Upload artifacts (1/2)
+      run: |
+        mkdir artifacts/
+        find . -type f \( -name "*.apk" -o -name "*.aab" \) -exec mv {} artifacts/ \;
+        cd artifacts
+        tar -cvf artifacts.tar *
+
+    - name: 📦 Upload artifacts (2/2)
       uses: actions/upload-artifact@v3
       with:
-        name: app-debug.apk
-        path: app-debug.apk
+        name: artifacts.tar
+        path: artifacts/artifacts.tar
         retention-days: 30
