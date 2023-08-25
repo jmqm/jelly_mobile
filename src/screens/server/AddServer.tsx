@@ -7,7 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Background from 'src/components/styled/Background';
 
 const AddServerScreen = () => {
-    const { onSet } = server$.use();
+    const { onSet } = server$.get();
 
     const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
     const [address, setAddress] = useState<string>(__DEV__ ? 'http://10.0.0.237:8096' : '');

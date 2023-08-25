@@ -9,8 +9,8 @@ import user$ from 'src/state/user/user$';
 import TUser from 'src/state/user/TUser';
 
 const UserLoginScreen = () => {
-    const { onDelete: serverOnDelete } = server$.use();
-    const { onSet: userOnSet } = user$.use();
+    const { onDelete: serverOnDelete } = server$.get();
+    const { onSet: userOnSet } = user$.get();
 
     const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
     const [username, setUsername] = useState<string>(__DEV__ ? 'jmqm' : '');

@@ -12,8 +12,8 @@ import TMainNavigation from 'src/types/navigation/TMainNavigation';
 import TMediaNavigation from 'src/types/navigation/TMediaNavigation';
 
 const DeveloperScreen = () => {
-    const { server, onDelete: serverOnDelete } = server$.use();
-    const { user, onDelete: userOnDelete } = user$.use();
+    const { server, onDelete: serverOnDelete } = server$.get();
+    const { user, onDelete: userOnDelete } = user$.get();
 
     const mainNavigation: NavigationProp<TMainNavigation> = useNavigation();
     const mediaNavigation: NavigationProp<TMediaNavigation> = useNavigation();

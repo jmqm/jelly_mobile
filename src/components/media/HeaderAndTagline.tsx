@@ -18,7 +18,7 @@ type TProps = {
 
 const HeaderAndTaglineComponent = (props: TProps) => {
     const { media, imageType } = props;
-    const { server } = server$.use();
+    const { server } = server$.get();
 
     const [headerAnimate, setHeaderAnimate] = useState<boolean>(false);
 

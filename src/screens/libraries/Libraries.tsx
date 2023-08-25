@@ -16,7 +16,7 @@ type TProps = {
 
 const LibrariesScreen = (props: TProps) => {
     const { navigation } = props;
-    const { server } = server$.use();
+    const { server } = server$.get();
 
     const [libraryComponents, setLibraryComponents] = useState<ReactElement[] | null>(null);
 

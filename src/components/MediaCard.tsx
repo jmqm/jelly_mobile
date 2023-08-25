@@ -21,7 +21,7 @@ type TProps = {
 };
 
 const MediaCard = (props: TProps) => {
-    const { server } = server$.use();
+    const { server } = server$.get();
     const { media, type, hideText, onPress, onLayout } = props;
 
     const [imageFailed, setImageFailed] = useState<boolean>(false);

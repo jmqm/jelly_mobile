@@ -21,7 +21,7 @@ type TProps = {
 const SeasonScreen = (props: TProps) => {
     const { route, navigation } = props;
     const { series, season } = route.params!;
-    const { server } = server$.use();
+    const { server } = server$.get();
 
     const [_, forceReload] = useState<number>(0);
 
