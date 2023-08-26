@@ -310,8 +310,6 @@ export const StartPlayback = async (mediaId: string): Promise<TStartPlayback> =>
             return ConvertToTStartPlayback(playbackInfoDataJson);
         }
 
-
-
         // --- Use hls stream ---
     } catch (error) {
         console.log(`${StartPlayback.name} exception: ${error}`);
@@ -351,7 +349,7 @@ export const ReportPlayback = async (type: 'Started' | 'Progress', mediaId: stri
 
         // --- Use hls stream ---
     } catch (error) {
-        console.log(`${StartPlayback.name} exception: ${error}`);
+        console.log(`${ReportPlayback.name} exception: ${error}`);
     }
 
     return '';

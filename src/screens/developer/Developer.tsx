@@ -1,5 +1,5 @@
 import { NavigationProp, useNavigation } from '@react-navigation/native';
-import { Alert } from 'react-native';
+import { Alert, ScrollView } from 'react-native';
 import { StyleSheet, View } from 'react-native';
 import { Button } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -8,6 +8,7 @@ import Background from 'src/components/styled/Background';
 import { GenerateAuthorizationHeader, StartPlayback } from 'src/services/JellyfinAPI';
 import server$ from 'src/state/server/server$';
 import user$ from 'src/state/user/user$';
+import { DirectPlayDeviceProfile } from 'src/types/JellyfinAPI/device/TDeviceProfile';
 import TMainNavigation from 'src/types/navigation/TMainNavigation';
 import TMediaNavigation from 'src/types/navigation/TMediaNavigation';
 
@@ -41,13 +42,18 @@ const DeveloperScreen = () => {
 
     };
 
+    const goToVideoPlayer = () => {
+        mainNavigation.navigate('LibrariesStack', undefined!);
+        mediaNavigation.navigate('VideoPlayer', undefined!);
+    };
+
 
     return (
         <>
             <Background />
             <TopographyPattern />
 
-            <View style={[{ paddingTop: useSafeAreaInsets().top }, styles.main]}>
+            <ScrollView style={[{ paddingTop: useSafeAreaInsets().top }, { flex: 1 }]} contentContainerStyle={styles.main}>
                 <Button onPress={() => { serverOnDelete(); userOnDelete(); }} mode='contained-tonal'>Delete user and server</Button>
                 <Button onPress={showServerData} mode='contained-tonal'>Show server</Button>
                 <Button onPress={showUserData} mode='contained-tonal'>Show user</Button>
@@ -56,14 +62,15 @@ const DeveloperScreen = () => {
                 <Button onPress={() => StartPlayback('b3f1526ba0b2b2198bddaaf2af17cb0f')} mode='contained-tonal'>Get playbackUrl for Weak Hero S01E01</Button>
                 <Button onPress={goToFences} mode='contained-tonal'>Go to Fences</Button>
                 <Button onPress={goToMHA} mode='contained-tonal'>Go to MHA S06E23</Button>
-            </View>
+                <Button onPress={goToVideoPlayer} mode='contained-tonal'>Go to Video Player</Button>
+                <Button onPress={() => console.log(DirectPlayDeviceProfile)} mode='contained-tonal'>console DirectPlayProfile</Button>
+            </ScrollView>
         </>
     );
 };
 
 const styles = StyleSheet.create({
     main: {
-        flex: 1,
         flexDirection: 'column',
         justifyContent: 'center',
         gap: 16,

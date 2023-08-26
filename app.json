@@ -37,19 +37,10 @@
     },
     "plugins": [
       ["expo-screen-orientation", {
-        "initialOrientation": "DEFAULT"
-      }],
-      ["react-native-vlc-media-player", {
-        "ios": {
-            "includeVLCKit": false
-        },
-        "android": {
-            "legacyJetifier": false
-        }
+        "initialOrientation": "PORTRAIT"
       }],
       ["expo-build-properties", {
         "android": {
-          "compileSdkVersion": 33,
           "enableProguardInReleaseBuilds": true,
           "enableShrinkResourcesInReleaseBuilds": true
         }
