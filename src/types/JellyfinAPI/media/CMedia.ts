@@ -1,5 +1,6 @@
 import EMediaType from 'src/enums/EMediaType';
 import CUserData from 'src/types/JellyfinAPI/media/CUserData';
+import { ticksToMinutes } from 'src/utilities/time';
 
 class CMedia {
     //#region Fields
@@ -40,7 +41,7 @@ class CMedia {
         this.year = json.ProductionYear;
 
         this.runtimeInMinutes = json.RunTimeTicks && json.RunTimeTicks > 0
-            ? Math.round(json.RunTimeTicks / 10000 / 60000)
+            ? Math.round(ticksToMinutes(json.RunTimeTicks))
             : null;
 
         this.parentalRating = json.OfficialRating;

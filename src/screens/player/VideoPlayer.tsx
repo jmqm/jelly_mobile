@@ -1,61 +1,62 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { View } from 'react-native';
-import { StyleSheet } from 'react-native';
+import { Dimensions, StyleSheet } from 'react-native';
 import { Text } from 'react-native-paper';
 import Background from 'src/components/styled/Background';
 import { GenerateAuthorizationHeader, StartPlayback } from 'src/services/JellyfinAPI';
-import server$ from 'src/state/server/server$';
-import user$ from 'src/state/user/user$';
 import TMediaNavigation from 'src/types/navigation/TMediaNavigation';
 import { useFocusEffect } from '@react-navigation/native';
 import * as ScreenOrientation from 'expo-screen-orientation';
-import VideoRNV from 'react-native-video';
+// @ts-ignore: has no exported member named 'VideoDecoderProperties'
+import VideoRNV, { VideoDecoderProperties } from 'react-native-video';
 import { ResizeMode, Video as VideoEXPO } from 'expo-av';
+import BackButton from 'src/components/media/BackButton';
+import hiddenConfigurations$ from 'src/state/hiddenConfigurations/hiddenConfigurations$';
+import { minutesToMilliseconds, secondsToMilliseconds } from 'src/utilities/time';
 
 type TProps = {
 
 } & NativeStackScreenProps<TMediaNavigation, 'VideoPlayer'>;
 
+/**
+ * This will produce misleading results on an emulator device, at least on Android.
+*/
 const VideoPlayerScreen = (props: TProps) => {
     const { route } = props;
-    // const { media } = route.params!;
+    const { media } = route.params!;
 
-    const { server } = server$.get();
-    const { user } = user$.get();
+    const hiddenConfigurations = hiddenConfigurations$;
 
-    const media = {
-        id: '59c059d89cf3efcd96056add9377ca7f'
-    };
-
-    const options = [
-        `mediaSourceId=${media.id}`,
-        // 'allowVideoStreamCopy=true',
-        'startTimeTicks=0',
-        'segmentLength=60'
-    ];
-
+    const [errorCounter, setErrorCounter] = useState<number>(0);
+    const [playbackUrl, setPlaybackUrl] = useState<string | null>(null);
+    const [playbackType, setPlaybackType] = useState<string | undefined>();
 
     const videoRef = useRef<VideoRNV | null>(null);
-    // const [videoUrl, setVideoUrl] = useState<string | null>(null);
-    // const videoUrl = `${server.address}/Videos/${media.id}/stream.mp4?mediaSourceId=${media.id}`;
-    // const videoUrl = `${server.address}/Videos/${media.id}/master.m3u8?${options.join('&')}`;
-    const videoUrl = 'https://download.blender.org/peach/trailer/trailer_400p.ogg';
-    // const videoUrl = '';
-    console.log(videoUrl);
 
 
+    // Get playback url
     useEffect(() => {
         const load = async () => {
-            const playbackUrl = await StartPlayback(media.id);
+            const response = await StartPlayback(media.id, errorCounter > 0);
+
+            if (response.success) {
+                setPlaybackUrl(response.playbackUrl);
+                setPlaybackType(response.playbackType);
+            }
         };
 
-        // load();
-    }, []);
+        load();
+    }, [errorCounter]);
 
+
+    // Lock screen orientation
     useFocusEffect(
         useCallback(() => {
+            let initialOrientationLock: ScreenOrientation.OrientationLock;
+
             const goLandscape = async () => {
+                initialOrientationLock = await ScreenOrientation.getOrientationLockAsync();
                 await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
             };
 
@@ -63,42 +64,66 @@ const VideoPlayerScreen = (props: TProps) => {
 
             return async () => {
                 await ScreenOrientation.unlockAsync();
+
+                if (initialOrientationLock) {
+                    await ScreenOrientation.lockAsync(initialOrientationLock);
+                }
             };
         }, [])
     );
 
+    // Set defaults
+    useFocusEffect(
+        useCallback(() => {
+            const initialHideMainNavigation = hiddenConfigurations.hideMainNavigation.get();
+
+            hiddenConfigurations.hideMainNavigation.set(true);
+
+            return () => {
+                hiddenConfigurations.hideMainNavigation.set(initialHideMainNavigation);
+            };
+        }, [])
+    );
+
+
     return (
         <>
-            <Background />
+            <Background colour='black' />
+            <BackButton />
 
             <View style={styles.root}>
-                <VideoRNV
-                    ref={videoRef}
-                    source={{
-                        uri: videoUrl,
-                        headers: {
-                            ...GenerateAuthorizationHeader()
-                        }
-                    }}
-                    controls={true}
+                {playbackUrl && (
+                    <VideoRNV
+                        ref={videoRef}
+                        source={{
+                            uri: playbackUrl,
+                            headers: {
+                                ...GenerateAuthorizationHeader()
+                            },
+                            type: playbackType
+                        }}
+                        controls={true}
+                        fullscreen={true}
+                        fullscreenOrientation='landscape'
+                        hideShutterView={false}
 
-                    resizeMode='cover'
-                    style={styles.videoPlayer}
-                    onError={(e) => console.log(e.error)}
-                />
+                        bufferConfig={{
+                            bufferForPlaybackMs: secondsToMilliseconds(10),
+                            bufferForPlaybackAfterRebufferMs: secondsToMilliseconds(10),
+                            maxBufferMs: minutesToMilliseconds(5)
+                        }}
 
-                {/* <VideoEXPO
-                    source={{
-                        uri: videoUrl,
-                        headers: {
-                            ...GenerateAuthorizationHeader()
-                        }
-                    }}
-                    useNativeControls={true}
-                    resizeMode={ResizeMode.CONTAIN}
-                    style={styles.videoPlayer}
-                    onError={(e) => console.log(e)}
-                /> */}
+                        resizeMode='contain'
+                        style={styles.videoPlayer}
+                        onLoad={(e) => {
+                            console.log(`${VideoPlayerScreen.name} onLoad: ${JSON.stringify(e)}`);
+                        }}
+                        onError={(e) => {
+                            setErrorCounter((prev) => ++prev);
+                            console.log(`${VideoPlayerScreen.name} onError: ${JSON.stringify(e)}`);
+                        }}
+                    />
+                )}
             </View>
         </>
     );
@@ -106,13 +131,11 @@ const VideoPlayerScreen = (props: TProps) => {
 
 const styles = StyleSheet.create({
     root: {
-        flex: 1,
         position: 'absolute',
         top: 0,
         left: 0,
         bottom: 0,
-        right: 0,
-        zIndex: 11
+        right: 0
     },
     videoPlayer: {
         flex: 1

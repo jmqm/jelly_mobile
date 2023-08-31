@@ -5,6 +5,7 @@ import { MD3DarkTheme, MD3Theme } from 'react-native-paper';
 const theme: MD3Theme = {
     ...MD3DarkTheme,
 
+    version: 3,
     dark: true,
     mode: 'exact',
 

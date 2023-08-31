@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { createMaterialBottomTabNavigator } from 'react-native-paper/react-navigation';
 import AddServer from 'src/screens/server/AddServer';
 import server$ from 'src/state/server/server$';
@@ -11,25 +10,16 @@ import FullscreenLoadingScreen from 'src/screens/shared/FullscreenLoading';
 import LibrariesNavigation from 'src/navigation/LibrariesNavigation';
 import type TMainNavigation from 'src/types/navigation/TMainNavigation';
 import DeveloperScreen from 'src/screens/developer/Developer';
-import * as NavigationBar from 'expo-navigation-bar';
+import hiddenConfigurations$ from 'src/state/hiddenConfigurations/hiddenConfigurations$';
 
 const Tab = createMaterialBottomTabNavigator<TMainNavigation>();
 
 const MainNavigation = () => {
     const { server } = server$.use();
     const { user } = user$.use();
+    const hiddenConfigurations = hiddenConfigurations$;
 
     const paddingBottom = useSafeAreaInsets().bottom;
-
-
-    useEffect(() => {
-        const run = async () => {
-            await NavigationBar.setBackgroundColorAsync('transparent');
-            await NavigationBar.setPositionAsync('absolute');
-        };
-
-        run();
-    }, []);
 
 
     if (server === undefined) {
@@ -57,6 +47,9 @@ const MainNavigation = () => {
             shifting={true}
             safeAreaInsets={{ bottom: paddingBottom }}
             keyboardHidesNavigationBar={true}
+            barStyle={
+                hiddenConfigurations.hideMainNavigation.get() ? { display: 'none' } : null
+            }
         >
             {
                 // TODO: Make icons rounded.

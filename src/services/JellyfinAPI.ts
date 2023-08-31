@@ -11,8 +11,7 @@ import CMedia from 'src/types/JellyfinAPI/media/CMedia';
 import ELibraryType from 'src/enums/ELibraryType';
 import CSeries from 'src/types/JellyfinAPI/media/CSeries';
 import CSeason from 'src/types/JellyfinAPI/media/CSeason';
-import { DirectPlayDeviceProfile } from 'src/types/JellyfinAPI/device/TDeviceProfile';
-import TStartPlayback, { ConvertToTStartPlayback } from 'src/types/JellyfinAPI/TStartPlayback';
+import TStartPlayback from 'src/types/JellyfinAPI/TStartPlayback';
 
 // https://api.jellyfin.org/
 // https://demo.jellyfin.org/stable/api-docs/swagger/index.html (better)
@@ -278,39 +277,74 @@ export const SetMediaFavourite = async (mediaId: string, favourite: boolean): Pr
 
 //#region Playback
 
-export const StartPlayback = async (mediaId: string): Promise<TStartPlayback> => {
+export const StartPlayback = async (mediaId: string, fallbackToH264: boolean = false): Promise<TStartPlayback> => {
     try {
-        // --- Get transcoding url through playback info ---
-        const profile = DirectPlayDeviceProfile;
+        // TODO: Support AV1 for getPlaybackUrlStream
 
-        const playbackInfoResponse = await fetch(`${server.address}/Items/${mediaId}/PlaybackInfo` +
-                                     `?UserId=${user.id}` +
-                                     `&StartTimeTicks=${0}` +
-                                     `&IsPlayback=${true}` +
-                                     `&AutoOpenLiveStream=${true}` +
-                                     `&MediaSourceId=${mediaId}` +
-                                     `&MaxStreamingBitrate=${profile.MaxStreamingBitrate}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json', // Without this, will get a 'Network request failed' error.
-                'Accept': 'application/json',
-                ...GenerateAuthorizationHeader()
-            },
-            body: JSON.stringify({
-                UserId: user.id,
-                DeviceProfile: profile
-            })
-        });
+        let playbackType: string | undefined = undefined;
 
-        const playbackInfoData = await playbackInfoResponse.text();
-        const playbackInfoDataJson = JSON.parse(playbackInfoData);
+        // Gets static/non-encoded/no-files-created stream
+        const getPlaybackUrlStatic = () => {
+            const options = [
+                'static=true',
+                `MediaSourceId=${mediaId}`,
+                'subtitleMethod=Hls'
+            ];
 
-        // If transcoding url is provided, use that.
-        if (playbackInfoDataJson.MediaSources && playbackInfoDataJson.MediaSources[0].TranscodingUrl) {
-            return ConvertToTStartPlayback(playbackInfoDataJson);
+            playbackType = undefined;
+            return `${server.address}/Videos/${mediaId}/stream?${options.join('&')}`;
+        };
+
+        // Gets remuxed/encoded stream
+        const getPlaybackUrlStream = () => {
+            const options = [
+                `MediaSourceId=${mediaId}`,
+                'startTimeTicks=0',
+                'segmentLength=60',
+                'minSegments=5',
+                'segmentContainer=mp4',
+                'videoCodec=h264',
+                'subtitleMethod=Hls'
+            ];
+
+            playbackType = 'm3u8';
+            return `${server.address}/Videos/${mediaId}/master.m3u8?${options.join('&')}`;
+        };
+
+        // Gets play session id for reporting playback progress
+        const getPlaySessionId = async () => {
+            const options = [
+                `MediaSourceId=${mediaId}`,
+                `UserId=${user.id}`
+            ];
+
+            const playbackInfoResponse = await fetch(`${server.address}/Items/${mediaId}/PlaybackInfo?${options.join('&')}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json', // Without this, will get a 'Unsupported Media Type' response.
+                    'Accept': 'application/json',
+                    ...GenerateAuthorizationHeader()
+                }
+            });
+
+            const playbackInfoData = await playbackInfoResponse.text();
+            const playbackInfoDataJson = JSON.parse(playbackInfoData);
+
+            return playbackInfoDataJson.PlaySessionId;
+        };
+
+        const playbackUrl = fallbackToH264 ? getPlaybackUrlStream() : getPlaybackUrlStatic();
+        const playSessionId = await getPlaySessionId();
+
+        if (playbackUrl && playSessionId) {
+            return {
+                success: true,
+
+                playbackUrl: playbackUrl,
+                playbackType: playbackType,
+                playSessionId: playSessionId
+            };
         }
-
-        // --- Use hls stream ---
     } catch (error) {
         console.log(`${StartPlayback.name} exception: ${error}`);
     }
@@ -320,9 +354,9 @@ export const StartPlayback = async (mediaId: string): Promise<TStartPlayback> =>
     };
 };
 
-export const ReportPlayback = async (type: 'Started' | 'Progress', mediaId: string): Promise<string> => {
+export const ReportPlayback = async (type: 'Started' | 'Progress' | 'Stopped', mediaId: string): Promise<string> => {
     try {
-        const playbackInfoResponse = await fetch(`${server.address}/Sessions/Playing${type === 'Progress' ? '/Progress' : ''}`, {
+        const response = await fetch(`${server.address}/Sessions/Playing${type !== 'Started' ? `/${type}` : ''}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json', // Without this, will get a 'Network request failed' error.
@@ -334,20 +368,8 @@ export const ReportPlayback = async (type: 'Started' | 'Progress', mediaId: stri
             })
         });
 
-        const playbackInfoData = await playbackInfoResponse.text();
-        const playbackInfoDataJson = JSON.parse(playbackInfoData);
-
-        if (playbackInfoDataJson.MediaSourcesx[0]?.thing) {
-            console.log('booga');
-        }
-
-        // If transcoding url is provided, use that.
-        if (playbackInfoDataJson.MediaSources && playbackInfoDataJson.MediaSources[0].TranscodingUrl) {
-            return `${server.address}/${playbackInfoDataJson.MediaSources[0].TranscodingUrl}`;
-        }
-
-
-        // --- Use hls stream ---
+        const data = await response.text();
+        const dataJson = JSON.parse(data);
     } catch (error) {
         console.log(`${ReportPlayback.name} exception: ${error}`);
     }

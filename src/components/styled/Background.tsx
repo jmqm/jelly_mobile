@@ -3,10 +3,11 @@ import { useTheme } from 'react-native-paper';
 
 type TProps = {
     children?: never;
+    colour?: string;
 } & ViewProps
 
 const Background = (props: TProps) => {
-    const { style, ...otherProps } = props;
+    const { colour, style, ...otherProps } = props;
 
     const theme = useTheme();
 
@@ -14,7 +15,7 @@ const Background = (props: TProps) => {
         position: 'absolute',
         width: '100%',
         height: '100%',
-        backgroundColor: theme.colors.background
+        backgroundColor: colour ?? theme.colors.background
     };
 
     return (

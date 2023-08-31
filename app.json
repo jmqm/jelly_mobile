@@ -36,11 +36,9 @@
       }
     },
     "plugins": [
-      ["expo-screen-orientation", {
-        "initialOrientation": "PORTRAIT"
-      }],
       ["expo-build-properties", {
         "android": {
+          "minSdkVersion": 21,
           "enableProguardInReleaseBuilds": true,
           "enableShrinkResourcesInReleaseBuilds": true
         }

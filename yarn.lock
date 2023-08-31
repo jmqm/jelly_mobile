@@ -1578,13 +1578,6 @@
   resolved "https://registry.yarnpkg.com/@humanwhocodes/object-schema/-/object-schema-1.2.1.tgz#b520529ec21d8e5945a1851dfd1c32e94e39ff45"
   integrity sha512-ZnQMnLV4e7hDlUvw8H+U8ASL02SS2Gn6+9Ac3wGGLIe7+je2AeAOxPY+izIPJDfFDb7eDjev0Us8MO1iFRN8hA==
 
-"@jellyfin/sdk@^0.8.2":
-  version "0.8.2"
-  resolved "https://registry.yarnpkg.com/@jellyfin/sdk/-/sdk-0.8.2.tgz#25635e64eec7d49808ef366d12bb5af7e3e196b0"
-  integrity sha512-u3yfu7ODL9zN/ytQ+JomeZTkyVMuF5BR/y9tWL59tjgQ44Zf9MGBSeys3RGz60AW/OkpCP7G9MfaR3mP11pn6w==
-  dependencies:
-    compare-versions "5.0.3"
-
 "@jest/create-cache-key-function@^29.2.1":
   version "29.6.3"
   resolved "https://registry.yarnpkg.com/@jest/create-cache-key-function/-/create-cache-key-function-29.6.3.tgz#e16da2139246403fb359fd65fced012eb32aa2b1"
@@ -2995,11 +2988,6 @@ commondir@^1.0.1:
   resolved "https://registry.yarnpkg.com/commondir/-/commondir-1.0.1.tgz#ddd800da0c66127393cca5950ea968a3aaf1253b"
   integrity sha512-W9pAhw0ja1Edb5GVdIF1mjZw/ASI0AlShXM83UUGe2DVr5TdAPEA1OA8m/g8zWp9x6On7gqufY+FatDbC3MDQg==
 
-compare-versions@5.0.3:
-  version "5.0.3"
-  resolved "https://registry.yarnpkg.com/compare-versions/-/compare-versions-5.0.3.tgz#a9b34fea217472650ef4a2651d905f42c28ebfd7"
-  integrity sha512-4UZlZP8Z99MGEY+Ovg/uJxJuvoXuN4M6B3hKaiackiHrgzQFEe3diJi1mf1PNHbFujM7FvLrK2bpgIaImbtZ1A==
-
 compare-versions@^3.4.0:
   version "3.6.0"
   resolved "https://registry.yarnpkg.com/compare-versions/-/compare-versions-3.6.0.tgz#1a5689913685e5a87637b8d3ffca75514ec41d62"
@@ -3697,10 +3685,10 @@ expo-navigation-bar@~2.3.0:
     "@react-native/normalize-color" "^2.0.0"
     debug "^4.3.2"
 
-expo-screen-orientation@~6.1.1:
-  version "6.1.1"
-  resolved "https://registry.yarnpkg.com/expo-screen-orientation/-/expo-screen-orientation-6.1.1.tgz#9b7774c91d29ab5f7beb00969d302951d93078d3"
-  integrity sha512-K3uNFp7bWDGJ1IXUOaYvgT8ue8fAS9NEkdiBwXzIwSh+9CcefBJJgbFXnieohVv0HgYjqw6IjPMt47FIuyUofA==
+expo-screen-orientation@~5.2.0:
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/expo-screen-orientation/-/expo-screen-orientation-5.2.0.tgz#12226d76f76ba0bac3e206f2a6217756b1c301f4"
+  integrity sha512-Qudm37ElZUN8kjbqhrTfzGgGh8+zbEk8k8GGKJ8VbqaLq+uO+bR3vmc1yMDDbSKBZTDXybEXTHlilMawL8fscA==
 
 expo-splash-screen@~0.20.5:
   version "0.20.5"

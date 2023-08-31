@@ -29,7 +29,7 @@ const HeaderAndTaglineComponent = (props: TProps) => {
     const heroHeight = Math.min(
         Dimensions.get('window').width / (MediaConstants.backdrop.aspectRatio) + 25,
         Math.min(
-            Dimensions.get('window').height * 0.33,
+            Dimensions.get('window').height * 0.3,
             300
         ));
 
