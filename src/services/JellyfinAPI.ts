@@ -355,6 +355,33 @@ export const StartPlayback = async (mediaId: string, fallbackToH264: boolean = f
 };
 
 export const ReportPlayback = async (type: 'Started' | 'Progress' | 'Stopped', mediaId: string): Promise<string> => {
+    // TODO: Unfinished
+
+    try {
+        const response = await fetch(`${server.address}/Sessions/Playing${type !== 'Started' ? `/${type}` : ''}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json', // Without this, will get a 'Network request failed' error.
+                'Accept': 'application/json',
+                ...GenerateAuthorizationHeader()
+            },
+            body: JSON.stringify({
+                UserId: user.id
+            })
+        });
+
+        const data = await response.text();
+        const dataJson = JSON.parse(data);
+    } catch (error) {
+        console.log(`${ReportPlayback.name} exception: ${error}`);
+    }
+
+    return '';
+};
+
+export const GetSubtitles = async (mediaId: string): Promise<string> => {
+    // TODO: Unfinished
+
     try {
         const response = await fetch(`${server.address}/Sessions/Playing${type !== 'Started' ? `/${type}` : ''}`, {
             method: 'POST',

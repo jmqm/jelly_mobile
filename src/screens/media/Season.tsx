@@ -3,7 +3,7 @@ import type TMediaNavigation from 'src/types/navigation/TMediaNavigation';
 import { ToastAndroid, View, StyleSheet, Dimensions, Image, TouchableOpacity } from 'react-native';
 import { Appbar, Text } from 'react-native-paper';
 import Background from 'src/components/styled/Background';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import server$ from 'src/state/server/server$';
 import { FlashList } from '@shopify/flash-list';
 import CEpisode from 'src/types/JellyfinAPI/media/CEpisode';
@@ -12,7 +12,6 @@ import MaskedView from '@react-native-masked-view/masked-view';
 import { LinearGradient } from 'expo-linear-gradient';
 import OpacityAnimation from 'src/components/animations/OpacityAnimation';
 import { clamp } from 'src/utilities/General';
-import { useFocusEffect } from '@react-navigation/native';
 
 type TProps = {
 
@@ -23,6 +22,7 @@ const SeasonScreen = (props: TProps) => {
     const { series, season } = route.params!;
     const { server } = server$.get();
 
+    const [refreshing, setRefreshing] = useState<boolean>(false);
     const [_, forceReload] = useState<number>(0);
 
 
@@ -45,24 +45,30 @@ const SeasonScreen = (props: TProps) => {
         <View style={styles.separator} />
     );
 
+    const handleOnRefresh = () => {
+        setRefreshing(true);
+    };
+
 
     // Load data.
-    useFocusEffect(
-        useCallback(() => {
-            const load = async () => {
-                const response = await season.getEpisodes(series);
+    useEffect(() => {
+        const load = async () => {
+            const response = await season.getEpisodes(series);
 
-                if (response === false) {
-                    ToastAndroid.show('Unable to get season episodes', ToastAndroid.SHORT);
-                    return;
-                }
+            if (response === false) {
+                ToastAndroid.show('Unable to get season episodes', ToastAndroid.SHORT);
+                return;
+            }
 
-                forceReload((prev) => ++prev);
-            };
+            setRefreshing(false);
+            forceReload((prev) => ++prev);
+        };
 
+        if (season.episodes.length <= 0 || refreshing) {
+            console.log('called to get episodes');
             load();
-        }, [])
-    );
+        }
+    }, [refreshing]);
 
 
     const renderItem = ({ item: episode }: { item: CEpisode }) => {
@@ -123,6 +129,9 @@ const SeasonScreen = (props: TProps) => {
                     data={season.episodes}
                     renderItem={renderItem}
                     estimatedItemSize={cardSize}
+
+                    onRefresh={handleOnRefresh}
+                    refreshing={refreshing}
 
                     contentContainerStyle={styles.paddingHorizontal}
                     numColumns={1}

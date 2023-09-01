@@ -8,7 +8,6 @@ import Background from 'src/components/styled/Background';
 import { GenerateAuthorizationHeader, StartPlayback } from 'src/services/JellyfinAPI';
 import server$ from 'src/state/server/server$';
 import user$ from 'src/state/user/user$';
-import { DirectPlayDeviceProfile } from 'src/types/JellyfinAPI/device/TDeviceProfile';
 import TMainNavigation from 'src/types/navigation/TMainNavigation';
 import TMediaNavigation from 'src/types/navigation/TMediaNavigation';
 

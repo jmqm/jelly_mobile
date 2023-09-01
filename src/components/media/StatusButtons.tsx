@@ -24,6 +24,7 @@ const StatusButtonsComponent = (props: TProps) => {
             const response = await SetMediaWatched(media.id, statusToSet);
 
             setWatched(response === statusToSet);
+            media.userData.watched = watched;
             ToastAndroid.show(`${response ? 'Successfully' : 'Failed to'} set media watched status`, ToastAndroid.SHORT);
         }
     };
@@ -36,6 +37,7 @@ const StatusButtonsComponent = (props: TProps) => {
             const response = await SetMediaFavourite(media.id, statusToSet);
 
             setFavourite(response === statusToSet);
+            media.userData.favourite = favourite;
             ToastAndroid.show(`${response ? 'Successfully' : 'Failed to'} set media favourite status`, ToastAndroid.SHORT);
         }
     };

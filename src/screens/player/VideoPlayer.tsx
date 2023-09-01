@@ -107,6 +107,7 @@ const VideoPlayerScreen = (props: TProps) => {
                         fullscreenOrientation='landscape'
                         hideShutterView={false}
 
+                        text
                         bufferConfig={{
                             bufferForPlaybackMs: secondsToMilliseconds(10),
                             bufferForPlaybackAfterRebufferMs: secondsToMilliseconds(10),
