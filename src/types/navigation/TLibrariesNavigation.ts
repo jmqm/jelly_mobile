@@ -1,8 +1,8 @@
 import type TMediaNavigation from 'src/types/navigation/TMediaNavigation';
 
-type TLibrariesNavigation = {
+type TLibrariesNavigation = TMediaNavigation & {
     Libraries: undefined;
     Library: { id: string, name: string };
-} & TMediaNavigation;
+};
 
 export default TLibrariesNavigation;

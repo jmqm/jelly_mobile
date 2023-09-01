@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { LogBox } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { registerRootComponent } from 'expo';
 import { StatusBar } from 'expo-status-bar';
@@ -13,6 +14,11 @@ enableReactUse();
 // enableReactNativeComponents();
 
 const App = () => {
+    LogBox.ignoreLogs([
+        'Non-serializable values were found in the navigation state',
+        '`new NativeEventEmitter()` was called'
+    ]);
+
     useEffect(() => {
         const setDefaults = async () => {
             // Navigation bar

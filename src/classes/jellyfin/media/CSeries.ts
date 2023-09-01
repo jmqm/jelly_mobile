@@ -1,13 +1,15 @@
+import CMedia from 'src/classes/jellyfin/media/CMedia';
+import type TSeries from 'src/types/jellyfin/media/TSeries';
+import type TSeason from 'src/types/jellyfin/media/TSeason';
+import CSeason from 'src/classes/jellyfin/media/CSeason';
 import ESeriesStatus from 'src/enums/ESeriesStatus';
 import { GetSeriesSeasonsJson } from 'src/services/JellyfinAPI';
-import CMedia from 'src/types/JellyfinAPI/media/CMedia';
-import CSeason from 'src/types/JellyfinAPI/media/CSeason';
 
-class CSeries extends CMedia {
+class CSeries extends CMedia implements TSeries {
     //#region Fields
 
     status: ESeriesStatus;
-    seasons: CSeason[];
+    seasons: TSeason[];
 
     //#endregion
 
@@ -24,7 +26,7 @@ class CSeries extends CMedia {
         super(json);
 
         this.status = json.Status;
-        this.seasons = [] as CSeason[];
+        this.seasons = [] as TSeason[];
     }
 
     //#endregion
@@ -36,7 +38,7 @@ class CSeries extends CMedia {
             const response = await GetSeriesSeasonsJson(this.id);
 
             if (response.status) {
-                this.seasons = response.json!.Items.map((item: any) => new CSeason(item));
+                this.seasons = response.json!.Items.map((item: any) => new CSeason(this, item));
             }
 
             return response.status;

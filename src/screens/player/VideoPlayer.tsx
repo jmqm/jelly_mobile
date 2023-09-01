@@ -5,7 +5,7 @@ import { Dimensions, StyleSheet } from 'react-native';
 import { Text } from 'react-native-paper';
 import Background from 'src/components/styled/Background';
 import { GenerateAuthorizationHeader, StartPlayback } from 'src/services/JellyfinAPI';
-import TMediaNavigation from 'src/types/navigation/TMediaNavigation';
+import type TMediaNavigation from 'src/types/navigation/TMediaNavigation';
 import { useFocusEffect } from '@react-navigation/native';
 import * as ScreenOrientation from 'expo-screen-orientation';
 // @ts-ignore: has no exported member named 'VideoDecoderProperties'

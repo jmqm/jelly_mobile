@@ -1,6 +1,7 @@
-import CMedia from 'src/types/JellyfinAPI/media/CMedia';
+import CMedia from 'src/classes/jellyfin/media/CMedia';
+import type TMovie from 'src/types/jellyfin/media/TMovie';
 
-class CMovie extends CMedia {
+class CMovie extends CMedia implements TMovie {
     //#region Fields
 
     tagline: string;

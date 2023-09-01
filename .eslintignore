@@ -1,7 +1,8 @@
-/.expo/
-/.expo-shared/
-/assets/
-/node_modules/
+**/.expo
+**/.expo-shared
+**/.gitea
+**/assets
+**/node_modules
 
-/*.lock
-/*.json
+**/*.lock
+**/*.json

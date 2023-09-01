@@ -8,11 +8,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import OpacityAnimation from 'src/components/animations/OpacityAnimation';
 import MediaConstants from 'src/constants/Media';
 import server$ from 'src/state/server/server$';
-import CMedia from 'src/types/JellyfinAPI/media/CMedia';
-import CMovie from 'src/types/JellyfinAPI/media/CMovie';
+import type TMedia from 'src/types/jellyfin/media/TMedia';
+import CMovie from 'src/classes/jellyfin/media/CMovie';
 
 type TProps = {
-    media: CMedia;
+    media: TMedia;
     imageType: 'Primary' | 'Backdrop'
 };
 

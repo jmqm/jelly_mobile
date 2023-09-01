@@ -1,17 +1,17 @@
-import CEpisode from 'src/types/JellyfinAPI/media/CEpisode';
-import CMedia from 'src/types/JellyfinAPI/media/CMedia';
-import CMovie from 'src/types/JellyfinAPI/media/CMovie';
-import CSeason from 'src/types/JellyfinAPI/media/CSeason';
-import CSeries from 'src/types/JellyfinAPI/media/CSeries';
+import type TMedia from 'src/types/jellyfin/media/TMedia';
+import type TMovie from 'src/types/jellyfin/media/TMovie';
+import type TSeries from 'src/types/jellyfin/media/TSeries';
+import type TSeason from 'src/types/jellyfin/media/TSeason';
+import type TEpisode from 'src/types/jellyfin/media/TEpisode';
 
 type TMediaNavigation = {
-    Movie: { movie: CMovie };
+    Movie: { movie: TMovie };
 
-    Series: { series: CSeries };
-    Season: { series: CSeries, season: CSeason };
-    Episode: { episode: CEpisode };
+    Series: { series: TSeries };
+    Season: { season: TSeason };
+    Episode: { episode: TEpisode };
 
-    VideoPlayer: { media: CMedia };
+    VideoPlayer: { media: TMedia };
 };
 
 export default TMediaNavigation;

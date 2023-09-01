@@ -1,12 +1,12 @@
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { StyleSheet, LayoutChangeEvent } from 'react-native';
 import { FAB } from 'react-native-paper';
-import CMedia from 'src/types/JellyfinAPI/media/CMedia';
-import TMediaNavigation from 'src/types/navigation/TMediaNavigation';
+import type TMedia from 'src/types/jellyfin/media/TMedia';
+import type TMediaNavigation from 'src/types/navigation/TMediaNavigation';
 
 type TProps = {
     refHeight: (height: number) => void;
-    media: CMedia;
+    media: TMedia;
 };
 
 const FABPlayButtonComponent = (props: TProps) => {

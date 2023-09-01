@@ -6,12 +6,13 @@ import Background from 'src/components/styled/Background';
 import { useCallback, useEffect, useState } from 'react';
 import server$ from 'src/state/server/server$';
 import { FlashList } from '@shopify/flash-list';
-import CEpisode from 'src/types/JellyfinAPI/media/CEpisode';
+import type TEpisode from 'src/types/jellyfin/media/TEpisode';
 import theme from 'src/theme';
 import MaskedView from '@react-native-masked-view/masked-view';
 import { LinearGradient } from 'expo-linear-gradient';
 import OpacityAnimation from 'src/components/animations/OpacityAnimation';
 import { clamp } from 'src/utilities/General';
+import { useFocusEffect } from '@react-navigation/native';
 
 type TProps = {
 
@@ -19,11 +20,11 @@ type TProps = {
 
 const SeasonScreen = (props: TProps) => {
     const { route, navigation } = props;
-    const { series, season } = route.params!;
+    const { season } = route.params!;
     const { server } = server$.get();
 
     const [refreshing, setRefreshing] = useState<boolean>(false);
-    const [_, forceReload] = useState<number>(0);
+    const [reloadCounter, forceReload] = useState<number>(0);
 
 
     const height = Dimensions.get('window').height;
@@ -50,12 +51,12 @@ const SeasonScreen = (props: TProps) => {
     };
 
 
-    // Load data.
+    // Load data
     useEffect(() => {
         const load = async () => {
-            const response = await season.getEpisodes(series);
+            const success = await season.getEpisodes();
 
-            if (response === false) {
+            if (success === false) {
                 ToastAndroid.show('Unable to get season episodes', ToastAndroid.SHORT);
                 return;
             }
@@ -65,15 +66,22 @@ const SeasonScreen = (props: TProps) => {
         };
 
         if (season.episodes.length <= 0 || refreshing) {
-            console.log('called to get episodes');
             load();
         }
     }, [refreshing]);
 
 
-    const renderItem = ({ item: episode }: { item: CEpisode }) => {
+    // Refresh on focus
+    useFocusEffect(
+        useCallback(() => {
+            forceReload((prev) => ++prev);
+        }, [])
+    );
+
+
+    const renderItem = ({ item: episode }: { item: TEpisode }) => {
         const imageUrl = `${server.address}/Items/${episode.id}/Images/Primary?quality=60`;
-        const special = season.number !== episode.seasonNumber;
+        const special = season.number !== episode.season.number;
         const watched = episode.userData.watched;
         const allEpisodesWatched = season.episodes.every((episode) => episode.userData.watched);
 
@@ -127,6 +135,7 @@ const SeasonScreen = (props: TProps) => {
             <View style={styles.root}>
                 <FlashList
                     data={season.episodes}
+                    extraData={reloadCounter}
                     renderItem={renderItem}
                     estimatedItemSize={cardSize}
 

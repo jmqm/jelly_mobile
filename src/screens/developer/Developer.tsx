@@ -8,8 +8,8 @@ import Background from 'src/components/styled/Background';
 import { GenerateAuthorizationHeader, StartPlayback } from 'src/services/JellyfinAPI';
 import server$ from 'src/state/server/server$';
 import user$ from 'src/state/user/user$';
-import TMainNavigation from 'src/types/navigation/TMainNavigation';
-import TMediaNavigation from 'src/types/navigation/TMediaNavigation';
+import type TMainNavigation from 'src/types/navigation/TMainNavigation';
+import type TMediaNavigation from 'src/types/navigation/TMediaNavigation';
 
 const DeveloperScreen = () => {
     const { server, onDelete: serverOnDelete } = server$.get();
@@ -62,7 +62,6 @@ const DeveloperScreen = () => {
                 <Button onPress={goToFences} mode='contained-tonal'>Go to Fences</Button>
                 <Button onPress={goToMHA} mode='contained-tonal'>Go to MHA S06E23</Button>
                 <Button onPress={goToVideoPlayer} mode='contained-tonal'>Go to Video Player</Button>
-                <Button onPress={() => console.log(DirectPlayDeviceProfile)} mode='contained-tonal'>console DirectPlayProfile</Button>
             </ScrollView>
         </>
     );

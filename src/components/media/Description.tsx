@@ -1,10 +1,10 @@
 import { StyleSheet } from 'react-native';
 import { Text } from 'react-native-paper';
-import CMedia from 'src/types/JellyfinAPI/media/CMedia';
+import type TMedia from 'src/types/jellyfin/media/TMedia';
 import { removeHtmlTags } from 'src/utilities/General';
 
 type TProps = {
-    media: CMedia;
+    media: TMedia;
 };
 
 const DescriptionComponent = (props: TProps) => {

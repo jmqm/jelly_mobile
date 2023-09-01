@@ -1,18 +1,18 @@
 import { ComponentProps } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 import MediaCard from 'src/components/MediaCard';
-import CMedia from 'src/types/JellyfinAPI/media/CMedia';
+import type TMedia from 'src/types/jellyfin/media/TMedia';
 
 type TProps = {
-    data: CMedia[];
+    data: TMedia[];
     imageType: ComponentProps<typeof MediaCard>['type'];
-    onPress?: (item: CMedia) => void;
+    onPress?: (item: TMedia) => void;
 };
 
 const SectionFlatListComponent = (props: TProps) => {
     const { data, imageType, onPress } = props;
 
-    const renderItem = ({ item }: { item: CMedia }) => (
+    const renderItem = ({ item }: { item: TMedia }) => (
         <MediaCard media={item} type={imageType} onPress={onPress ? () => onPress(item) : undefined} />
     );
 

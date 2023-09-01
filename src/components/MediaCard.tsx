@@ -3,16 +3,17 @@ import { TouchableHighlight } from 'react-native';
 import { View, StyleSheet, LayoutChangeEvent } from 'react-native';
 import { Text, ProgressBar, useTheme } from 'react-native-paper';
 import { Image } from 'expo-image';
-import EMediaType from 'src/enums/EMediaType';
 import server$ from 'src/state/server/server$';
-import CEpisode from 'src/types/JellyfinAPI/media/CEpisode';
-import CMedia from 'src/types/JellyfinAPI/media/CMedia';
+import type TMedia from 'src/types/jellyfin/media/TMedia';
+import type TMovie from 'src/types/jellyfin/media/TMovie';
+import type TEpisode from 'src/types/jellyfin/media/TEpisode';
 import { getRecommendedPosterWidthSize, getRecommendedThumbnailWidthSize } from 'src/utilities/Media';
 import MediaConstants from 'src/constants/Media';
-import CMovie from 'src/types/JellyfinAPI/media/CMovie';
+import CEpisode from 'src/classes/jellyfin/media/CEpisode';
+import CMovie from 'src/classes/jellyfin/media/CMovie';
 
 type TProps = {
-    media: CMedia;
+    media: TMedia;
     type: 'Poster' | 'Thumbnail';
     hideText?: boolean;
 
@@ -35,8 +36,8 @@ const MediaCard = (props: TProps) => {
 
     // TODO: This functionality should not be here, MediaCard should not know anything of what image to load.
     const imageUrl =
-        media.type === EMediaType.Episode && type === 'Poster' ? `${server.address}/Items/${(media as CEpisode).seriesId}/Images/Primary?quality=60` :
-        media.type === EMediaType.Movie && type === 'Thumbnail' ? `${server.address}/Items/${(media as CMovie).id}/Images/Thumb?quality=60` :
+        media instanceof CEpisode && type === 'Poster' ? `${server.address}/Items/${(media as TEpisode).season.series.id}/Images/Primary?quality=60` :
+        media instanceof CMovie && type === 'Thumbnail' ? `${server.address}/Items/${(media as TMovie).id}/Images/Thumb?quality=60` :
         `${server.address}/Items/${media.id}/Images/Primary?quality=60`;
 
 

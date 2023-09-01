@@ -9,9 +9,9 @@ import Description from 'src/components/media/Description';
 import MediaInformation from 'src/components/media/MediaInformation';
 import Seasons from 'src/components/media/Seasons';
 import StatusButtons from 'src/components/media/StatusButtons';
-import CSeason from 'src/types/JellyfinAPI/media/CSeason';
-import CMedia from 'src/types/JellyfinAPI/media/CMedia';
+import type TSeason from 'src/types/jellyfin/media/TSeason';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import type TMedia from 'src/types/jellyfin/media/TMedia';
 
 type TProps = {
 
@@ -32,8 +32,8 @@ const SeriesScreen = (props: TProps) => {
         setRefreshing(true);
     };
 
-    const handleOnPress = (season: CMedia) => {
-        navigation.navigate('Season', { series: series, season: season as CSeason });
+    const handleOnPress = (season: TMedia) => {
+        navigation.navigate('Season', { season: season as TSeason });
     };
 
 
@@ -50,7 +50,9 @@ const SeriesScreen = (props: TProps) => {
             forceReload((prev) => ++prev);
         };
 
-        load();
+        if (series.seasons.length <= 0 || refreshing) {
+            load();
+        }
     }, [refreshing]);
 
 

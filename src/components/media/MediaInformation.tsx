@@ -1,9 +1,9 @@
 import { View, StyleSheet } from 'react-native';
 import { Chip, Text } from 'react-native-paper';
-import CMedia from 'src/types/JellyfinAPI/media/CMedia';
+import type TMedia from 'src/types/jellyfin/media/TMedia';
 
 type TProps = {
-    media: CMedia;
+    media: TMedia;
 };
 
 const MediaInformationComponent = (props: TProps) => {

@@ -1,4 +1,6 @@
-class CUserData {
+import type TUserData from 'src/types/jellyfin/media/TUserData';
+
+class CUserData implements TUserData {
     favourite?: boolean;
     watched?: boolean;
     watchedPercentage?: number;

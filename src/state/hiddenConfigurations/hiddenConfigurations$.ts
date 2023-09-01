@@ -1,5 +1,5 @@
 import { observable } from '@legendapp/state';
-import THiddenConfigurations from './THiddenConfigurations';
+import type THiddenConfigurations from './THiddenConfigurations';
 
 const hiddenConfigurations$ = observable<THiddenConfigurations>({ } as THiddenConfigurations);
 

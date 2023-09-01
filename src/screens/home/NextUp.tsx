@@ -3,10 +3,10 @@ import OpacityAnimationComponent from 'src/components/animations/OpacityAnimatio
 import SectionContainer from 'src/screens/home/SectionContainer';
 import SectionFlatList from 'src/screens/home/SectionFlatList';
 import { GetNextUp } from 'src/services/JellyfinAPI';
-import CMedia from 'src/types/JellyfinAPI/media/CMedia';
+import type TMedia from 'src/types/jellyfin/media/TMedia';
 
 const NextUpComponent = () => {
-    const [nextUp, setNextUp] = useState<CMedia[]>([]);
+    const [nextUp, setNextUp] = useState<TMedia[]>([]);
 
     useEffect(() => {
         const load = async () => {

@@ -1,4 +1,4 @@
-import TLibrary from 'src/types/JellyfinAPI/TLibrary';
+import type TLibrary from 'src/types/jellyfin/TLibrary';
 
 type TUserViews = {
     success: false;

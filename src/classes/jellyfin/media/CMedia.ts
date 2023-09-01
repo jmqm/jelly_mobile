@@ -1,24 +1,23 @@
 import EMediaType from 'src/enums/EMediaType';
-import CUserData from 'src/types/JellyfinAPI/media/CUserData';
+import CUserData from 'src/classes/jellyfin/media/CUserData';
 import { ticksToMinutes } from 'src/utilities/time';
+import type TMedia from 'src/types/jellyfin/media/TMedia';
+import type TUserData from 'src/types/jellyfin/media/TUserData';
 
-class CMedia {
+class CMedia implements TMedia {
     //#region Fields
-
-    type: EMediaType;
-
     name: string;
     originalName: string;
     description: string;
     id: string;
     year: number;
-
     runtimeInMinutes: number | null;
+
     parentalRating: string;
     communityRating: number;
     criticsRating: number;
 
-    userData: CUserData;
+    userData: TUserData;
 
     //#endregion
 
@@ -32,8 +31,6 @@ class CMedia {
     //#region Constructors
 
     constructor(json: any) {
-        this.type = CMedia.getType(json);
-
         this.name = json.Name;
         this.originalName = json.OriginalTitle;
         this.description = json.Overview;
@@ -55,7 +52,7 @@ class CMedia {
 
     //#region Helpers
 
-    public static createInstance(json: any): CMedia {
+    public static createInstance(json: any): TMedia {
         const type = CMedia.getType(json);
 
         const CMovie = require('./CMovie').default;

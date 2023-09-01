@@ -2,7 +2,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type TLibrariesNavigation from 'src/types/navigation/TLibrariesNavigation';
 import { StyleSheet, View } from 'react-native';
 import { memo, useEffect, useState } from 'react';
-import CMedia from 'src/types/JellyfinAPI/media/CMedia';
+import type TMedia from 'src/types/jellyfin/media/TMedia';
 import { GetUserLibraryItems } from 'src/services/JellyfinAPI';
 import MediaCard from 'src/components/MediaCard';
 import { FlashList } from '@shopify/flash-list';
@@ -11,8 +11,10 @@ import { Appbar } from 'react-native-paper';
 import RotationAnimation from 'src/components/animations/RotationAnimation';
 import TopographyPattern from 'src/components/patterns/TopographyPattern';
 import Background from 'src/components/styled/Background';
-import CMovie from 'src/types/JellyfinAPI/media/CMovie';
-import CSeries from 'src/types/JellyfinAPI/media/CSeries';
+import type TMovie from 'src/types/jellyfin/media/TMovie';
+import type TSeries from 'src/types/jellyfin/media/TSeries';
+import CMovie from 'src/classes/jellyfin/media/CMovie';
+import CSeries from 'src/classes/jellyfin/media/CSeries';
 
 type TProps = {
 
@@ -24,7 +26,7 @@ const LibraryScreen = (props: TProps) => {
 
     const [refreshAnimationValue, setRefreshAnimationValue] = useState(0);
 
-    const [items, setItems] = useState<CMedia[] | null>(null);
+    const [items, setItems] = useState<TMedia[] | null>(null);
 
     const [flashListNumColumns, setFlashListNumColumns] = useState<number>(1);
     const [flashListVisible, setFlashListVisible] = useState(false);
@@ -44,12 +46,12 @@ const LibraryScreen = (props: TProps) => {
         setRefreshAnimationValue((previousValue) => previousValue + 1);
     };
 
-    const renderItem = ({ item, index }: { item: CMedia, index: number }) => {
-        const handleOnPress = (item: CMedia) => {
-            if (item.type === EMediaType.Movie) {
-                navigation.navigate('Movie', { movie: item as CMovie });
-            } else if (item.type === EMediaType.Series) {
-                navigation.navigate('Series', { series: item as CSeries });
+    const renderItem = ({ item, index }: { item: TMedia, index: number }) => {
+        const handleOnPress = (item: TMedia) => {
+            if (item instanceof CMovie) {
+                navigation.navigate('Movie', { movie: item as TMovie });
+            } else if (item instanceof CSeries) {
+                navigation.navigate('Series', { series: item as TSeries });
             }
         };
 

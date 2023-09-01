@@ -3,10 +3,10 @@ import { StyleSheet } from 'react-native';
 import { Divider } from 'react-native-paper';
 import OpacityAnimation from 'src/components/animations/OpacityAnimation';
 import SectionFlatList from 'src/screens/home/SectionFlatList';
-import CSeries from 'src/types/JellyfinAPI/media/CSeries';
+import type TSeries from 'src/types/jellyfin/media/TSeries';
 
 type TProps = {
-    series: CSeries;
+    series: TSeries;
     seasonOnPress?: ComponentProps<typeof SectionFlatList>['onPress'];
 };
 

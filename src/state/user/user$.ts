@@ -3,7 +3,8 @@
 import { observable } from '@legendapp/state';
 import { persistObservable } from '@legendapp/state/persist';
 import { ObservablePersistMMKV } from '@legendapp/state/persist-plugins/mmkv';
-import TUser, { createUser } from './TUser';
+import type TUser from './TUser';
+import { createUser } from './TUser';
 
 const user$ = observable<{
     user: TUser,

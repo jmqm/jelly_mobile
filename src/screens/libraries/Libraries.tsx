@@ -7,7 +7,7 @@ import TopographyPattern from 'src/components/patterns/TopographyPattern';
 import Background from 'src/components/styled/Background';
 import server$ from 'src/state/server/server$';
 import { GetUserLibraries } from 'src/services/JellyfinAPI';
-import TLibrary from 'src/types/JellyfinAPI/TLibrary';
+import type TLibrary from 'src/types/jellyfin/TLibrary';
 import type TLibrariesNavigation from 'src/types/navigation/TLibrariesNavigation';
 
 type TProps = {

@@ -1,17 +1,20 @@
-import { ConvertToTLogIn } from '../types/JellyfinAPI/TLogIn';
-import TGetPublicInfo, { ConvertToTGetPublicInfo } from 'src/types/JellyfinAPI/TGetPublicInfo';
-import TLogIn from 'src/types/JellyfinAPI/TLogIn';
+import { ConvertToTLogIn } from '../types/jellyfin/TLogIn';
+import type TGetPublicInfo from 'src/types/jellyfin/TGetPublicInfo';
+import { ConvertToTGetPublicInfo } from 'src/types/jellyfin/TGetPublicInfo';
+import type TLogIn from 'src/types/jellyfin/TLogIn';
 import server$ from 'src/state/server/server$';
 import user$ from 'src/state/user/user$';
 import Constants from 'expo-constants';
 import * as Device from 'expo-device';
 import EHomeSection from 'src/enums/EHomeSection';
-import TLibrary, { ConvertToTLibrary } from 'src/types/JellyfinAPI/TLibrary';
-import CMedia from 'src/types/JellyfinAPI/media/CMedia';
+import type TLibrary from 'src/types/jellyfin/TLibrary';
+import { ConvertToTLibrary } from 'src/types/jellyfin/TLibrary';
+import type TMedia from 'src/types/jellyfin/media/TMedia';
 import ELibraryType from 'src/enums/ELibraryType';
-import CSeries from 'src/types/JellyfinAPI/media/CSeries';
-import CSeason from 'src/types/JellyfinAPI/media/CSeason';
-import TStartPlayback from 'src/types/JellyfinAPI/TStartPlayback';
+import type TStartPlayback from 'src/types/jellyfin/TStartPlayback';
+import CMedia from 'src/classes/jellyfin/media/CMedia';
+import type TSeries from 'src/types/jellyfin/media/TSeries';
+import type TSeason from 'src/types/jellyfin/media/TSeason';
 
 // https://api.jellyfin.org/
 // https://demo.jellyfin.org/stable/api-docs/swagger/index.html (better)
@@ -124,7 +127,7 @@ export const GetUserLibraries = async (): Promise<TLibrary[]> => {
     return ConvertToTLibrary();
 };
 
-export const GetUserLibraryLatest = async (libraryId: string): Promise<CMedia[]> => {
+export const GetUserLibraryLatest = async (libraryId: string): Promise<TMedia[]> => {
     try {
         const response = await fetch(`${server.address}/Users/${user.id}/Items/Latest` +
                                      `?Limit=16&ParentId=${libraryId}`, {
@@ -144,7 +147,7 @@ export const GetUserLibraryLatest = async (libraryId: string): Promise<CMedia[]>
     return [];
 };
 
-export const GetUserLibraryItems = async (libraryId: string, searchTerm?: string): Promise<CMedia[]> => {
+export const GetUserLibraryItems = async (libraryId: string, searchTerm?: string): Promise<TMedia[]> => {
     try {
         const fields = ['OriginalTitle', 'Taglines', 'Overview',
             'ProductionYear', 'RunTimeTicks', 'OfficialRating',
@@ -172,7 +175,7 @@ export const GetUserLibraryItems = async (libraryId: string, searchTerm?: string
     return [];
 };
 
-export const GetMediaDetails = async (mediaId: string): Promise<CMedia | null> => {
+export const GetMediaDetails = async (mediaId: string): Promise<TMedia | null> => {
     try {
         // TODO: Include AspectRatio field to remove constant of aspect ratio.
         const response = await fetch(`${server.address}/Users/${user.id}/Items/${mediaId}`, {
@@ -215,7 +218,7 @@ export const GetSeriesSeasonsJson = async (seriesId: string): Promise<{status: b
     return { status: true };
 };
 
-export const GetSeasonEpisodesJson = async (series: CSeries, season: CSeason): Promise<{status: boolean, json?: any}> => {
+export const GetSeasonEpisodesJson = async (series: TSeries, season: TSeason): Promise<{status: boolean, json?: any}> => {
     try {
         const fields = ['Overview', 'BasicSyncInfo'];
 
@@ -408,7 +411,7 @@ export const GetSubtitles = async (mediaId: string): Promise<string> => {
 
 //#region Home sections
 
-export const GetContinueWatching = async (): Promise<CMedia[]> => {
+export const GetContinueWatching = async (): Promise<TMedia[]> => {
     try {
         const response = await fetch(`${server.address}/Users/${user.id}/Items/Resume` +
                                      '?Limit=12&Recursive=true&includeItemTypes=Episode,Movie', {
@@ -428,7 +431,7 @@ export const GetContinueWatching = async (): Promise<CMedia[]> => {
     return [];
 };
 
-export const GetNextUp = async (cutOffDateTime: Date): Promise<CMedia[]> => {
+export const GetNextUp = async (cutOffDateTime: Date): Promise<TMedia[]> => {
     try {
         const response = await fetch(`${server.address}/Shows/NextUp` +
                                      '?UserId=b310988995c24ba3bc58fb3b2f4510b2' +

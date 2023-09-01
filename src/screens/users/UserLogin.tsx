@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Background from 'src/components/styled/Background';
 import server$ from 'src/state/server/server$';
 import user$ from 'src/state/user/user$';
-import TUser from 'src/state/user/TUser';
+import type TUser from 'src/state/user/TUser';
 
 const UserLoginScreen = () => {
     const { onDelete: serverOnDelete } = server$.get();

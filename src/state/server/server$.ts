@@ -3,7 +3,8 @@
 import { observable } from '@legendapp/state';
 import { persistObservable } from '@legendapp/state/persist';
 import { ObservablePersistMMKV } from '@legendapp/state/persist-plugins/mmkv';
-import TServer, { createServer } from './TServer';
+import type TServer from './TServer';
+import { createServer } from './TServer';
 
 const server$ = observable<{
     server: TServer,

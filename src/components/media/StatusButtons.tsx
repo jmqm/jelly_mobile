@@ -3,10 +3,10 @@ import { StyleSheet, ToastAndroid, View } from 'react-native';
 import { Divider } from 'react-native-paper';
 import StyledIconButton from 'src/components/styled/StyledIconButton';
 import { SetMediaFavourite, SetMediaWatched } from 'src/services/JellyfinAPI';
-import CMedia from 'src/types/JellyfinAPI/media/CMedia';
+import type TMedia from 'src/types/jellyfin/media/TMedia';
 
 type TProps = {
-    media: CMedia;
+    media: TMedia;
 };
 
 const StatusButtonsComponent = (props: TProps) => {
@@ -16,6 +16,7 @@ const StatusButtonsComponent = (props: TProps) => {
     const [favourite, setFavourite] = useState<boolean | null>(media.userData.favourite ?? false);
     const [downloaded, _] = useState<boolean | null>(false);
 
+
     const handleOnWatchedPress = async () => {
         if (watched !== null) {
             const statusToSet = !watched;
@@ -24,7 +25,7 @@ const StatusButtonsComponent = (props: TProps) => {
             const response = await SetMediaWatched(media.id, statusToSet);
 
             setWatched(response === statusToSet);
-            media.userData.watched = watched;
+            media.userData.watched = response === statusToSet;
             ToastAndroid.show(`${response ? 'Successfully' : 'Failed to'} set media watched status`, ToastAndroid.SHORT);
         }
     };
@@ -37,10 +38,11 @@ const StatusButtonsComponent = (props: TProps) => {
             const response = await SetMediaFavourite(media.id, statusToSet);
 
             setFavourite(response === statusToSet);
-            media.userData.favourite = favourite;
+            media.userData.favourite = response === statusToSet;
             ToastAndroid.show(`${response ? 'Successfully' : 'Failed to'} set media favourite status`, ToastAndroid.SHORT);
         }
     };
+
 
     const handleOnPress = () => {
         ToastAndroid.show('This feature is currently unsupported.', ToastAndroid.SHORT);
