@@ -46,10 +46,6 @@ const SeasonScreen = (props: TProps) => {
         <View style={styles.separator} />
     );
 
-    const handleOnRefresh = () => {
-        setRefreshing(true);
-    };
-
 
     // Load data
     useEffect(() => {
@@ -139,8 +135,8 @@ const SeasonScreen = (props: TProps) => {
                     renderItem={renderItem}
                     estimatedItemSize={cardSize}
 
-                    onRefresh={handleOnRefresh}
                     refreshing={refreshing}
+                    onRefresh={() => setRefreshing(true)}
 
                     contentContainerStyle={styles.paddingHorizontal}
                     numColumns={1}

@@ -8,9 +8,9 @@ module.exports = function(api) {
                 jsxRuntime: 'automatic', // jsx transform
                 lazyImports: true, // imports are lazy-loaded
                 web: { disableImportExportTransform: true } // prevent module.exports
-            }
-            ],
-            '@babel/preset-typescript'],
+            }],
+            '@babel/preset-typescript'
+        ],
 
         plugins: [
             ['module-resolver', {
@@ -24,7 +24,9 @@ module.exports = function(api) {
 
         env: {
             production: {
-                plugins: ['react-native-paper/babel']
+                plugins: [
+                    'react-native-paper/babel'
+                ]
             }
         }
     };

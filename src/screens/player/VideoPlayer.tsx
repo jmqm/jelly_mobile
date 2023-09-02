@@ -6,7 +6,7 @@ import { Text } from 'react-native-paper';
 import Background from 'src/components/styled/Background';
 import { GenerateAuthorizationHeader, StartPlayback } from 'src/services/JellyfinAPI';
 import type TMediaNavigation from 'src/types/navigation/TMediaNavigation';
-import { useFocusEffect } from '@react-navigation/native';
+import { NavigationProp, useFocusEffect, useNavigation } from '@react-navigation/native';
 import * as ScreenOrientation from 'expo-screen-orientation';
 // @ts-ignore: has no exported member named 'VideoDecoderProperties'
 import VideoRNV, { VideoDecoderProperties } from 'react-native-video';
@@ -14,6 +14,7 @@ import { ResizeMode, Video as VideoEXPO } from 'expo-av';
 import BackButton from 'src/components/media/BackButton';
 import hiddenConfigurations$ from 'src/state/hiddenConfigurations/hiddenConfigurations$';
 import { minutesToMilliseconds, secondsToMilliseconds } from 'src/utilities/time';
+import TMainNavigation from 'src/types/navigation/TMainNavigation';
 
 type TProps = {
 
@@ -107,7 +108,6 @@ const VideoPlayerScreen = (props: TProps) => {
                         fullscreenOrientation='landscape'
                         hideShutterView={false}
 
-                        text
                         bufferConfig={{
                             bufferForPlaybackMs: secondsToMilliseconds(10),
                             bufferForPlaybackAfterRebufferMs: secondsToMilliseconds(10),
