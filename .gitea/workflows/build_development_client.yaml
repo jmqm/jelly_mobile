@@ -11,9 +11,7 @@ on:
 
 jobs:
   main:
-    runs:
-      using: 'docker'
-      image: 'react_native_expo_ubuntu20.04'
+    runs-on: react_native_expo_ubuntu20.04
 
     steps:
     - name: 🏗 Check out repo
