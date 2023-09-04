@@ -6,10 +6,17 @@ on:
       - closed
     branches:
       - main
+  # Testing only
+  push:
+
+defaults:
+  runs:
+    using: 'docker'
+    image: 'react_native_expo_ubuntu20.04'
 
 jobs:
   main:
-    runs-on: ubuntu-20.04
+    <<: *defaults
 
     steps:
     - name: 🏗 Check out repo
