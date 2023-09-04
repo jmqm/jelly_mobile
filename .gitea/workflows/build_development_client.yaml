@@ -6,12 +6,10 @@ on:
       - closed
     branches:
       - main
-  # Testing only
-  push:
 
 jobs:
   main:
-    runs-on: react_native_expo_ubuntu20.04
+    runs-on: ubuntu-20.04
 
     steps:
     - name: 🏗 Check out repo
