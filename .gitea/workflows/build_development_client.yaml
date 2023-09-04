@@ -9,14 +9,11 @@ on:
   # Testing only
   push:
 
-defaults:
-  runs:
-    using: 'docker'
-    image: 'react_native_expo_ubuntu20.04'
-
 jobs:
   main:
-    <<: *defaults
+    runs:
+      using: 'docker'
+      image: 'react_native_expo_ubuntu20.04'
 
     steps:
     - name: 🏗 Check out repo
