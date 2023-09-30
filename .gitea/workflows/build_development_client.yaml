@@ -91,9 +91,7 @@ jobs:
         yarn global add eas-cli-local-build-plugin
 
     - name: ⚙ Install dependencies
-      if: steps.cache-packages.outputs.cache-hit != 'true'
       run: |
-        echo 'node_modules cache changed'
         yarn install
 
     - name: 📋 Test project'
