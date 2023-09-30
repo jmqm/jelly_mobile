@@ -17,6 +17,10 @@ jobs:
     - name: 🏗 Check out repo
       uses: actions/checkout@v3
 
+    - name: ⚙ Create .env file
+      run: |
+        echo "${{ secrets.ENV }}" > .env
+
     - name: 📁 Cache node_modules global (1/2)
       id: hash-packages_global
       uses: theowenyoung/folder-hash@v3
