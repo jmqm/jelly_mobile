@@ -108,6 +108,9 @@ const SeasonScreen = (props: TProps) => {
                             <View style={styles.textContainer}>
                                 <Text variant='titleSmall' numberOfLines={2}>
                                     {episode.formattedString(special ? true : false, true, true, special ? undefined : '. ')}
+                                    {/* {special && (
+                                        `Special${episode.formattedString(false, false, true, undefined)}`
+                                    )} */}
                                 </Text>
                                 <Text style={styles.description}>{episode.description}</Text>
                             </View>

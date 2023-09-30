@@ -20,6 +20,7 @@ class CEpisode extends CMedia implements TEpisode {
     constructor(season: TSeason, json: any) {
         super(json);
 
+        // TODO: Specials shouldn't be in this season
         this.season = season;
         this.number = json.IndexNumber;
     }
@@ -27,13 +28,25 @@ class CEpisode extends CMedia implements TEpisode {
     //#region Helper functions
 
     public formattedString(season: boolean = true, episode: boolean = true, name: boolean = true, separator: string = ' - '): string {
+        const addSeparator = !!separator;
+        const addEpisode = episode && isFinite(this.number);
+        const addSeason = season && isFinite(this.season.number);
+
         let formattedString = name ? this.name : '';
 
-        if (episode && isFinite(this.number)) {
-            formattedString = `E${this.number}${name ? separator : ''}${formattedString}`;
+        if (addSeparator) {
+            formattedString = `${separator}${formattedString}`;
         }
 
-        if (season && isFinite(this.season.number)) {
+        if (addEpisode) {
+            formattedString = `E${this.number}${formattedString}`;
+
+            if (addSeason) {
+                formattedString = `:${formattedString}`;
+            }
+        }
+
+        if (addSeason) {
             formattedString = `S${this.season.number}:${formattedString}`;
         }
 

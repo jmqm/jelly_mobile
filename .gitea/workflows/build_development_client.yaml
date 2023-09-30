@@ -6,6 +6,8 @@ on:
       - closed
     branches:
       - main
+  # Debugging only:
+  push:
 
 jobs:
   main:

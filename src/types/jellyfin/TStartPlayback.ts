@@ -1,11 +1,12 @@
 type TStartPlayback = {
-    success: false
+    success: false,
+    errorMessage?: string
 } | {
     success: true,
 
+    playSessionId: string,
     playbackUrl: string,
-    playbackType: string | undefined,
-    playSessionId: string
+    playbackType: string | undefined
 };
 
 export default TStartPlayback;

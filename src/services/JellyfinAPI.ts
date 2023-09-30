@@ -281,6 +281,8 @@ export const SetMediaFavourite = async (mediaId: string, favourite: boolean): Pr
 //#region Playback
 
 export const StartPlayback = async (mediaId: string, fallbackToH264: boolean = false): Promise<TStartPlayback> => {
+    let errorMessage = undefined;
+
     try {
         // TODO: Support AV1 for getPlaybackUrlStream
 
@@ -311,7 +313,7 @@ export const StartPlayback = async (mediaId: string, fallbackToH264: boolean = f
             ];
 
             playbackType = 'm3u8';
-            return `${server.address}/Videos/${mediaId}/master.m3u8?${options.join('&')}`;
+            return `${server.address}/Videos/${mediaId}/main.m3u8?${options.join('&')}`;
         };
 
         // Gets play session id for reporting playback progress
@@ -337,23 +339,26 @@ export const StartPlayback = async (mediaId: string, fallbackToH264: boolean = f
         };
 
         const playbackUrl = fallbackToH264 ? getPlaybackUrlStream() : getPlaybackUrlStatic();
+        // const playbackUrl = getPlaybackUrlStream();
         const playSessionId = await getPlaySessionId();
 
         if (playbackUrl && playSessionId) {
             return {
                 success: true,
 
+                playSessionId: playSessionId,
                 playbackUrl: playbackUrl,
-                playbackType: playbackType,
-                playSessionId: playSessionId
+                playbackType: playbackType
             };
         }
     } catch (error) {
         console.log(`${StartPlayback.name} exception: ${error}`);
+        errorMessage = `${error}`;
     }
 
     return {
-        success: false
+        success: false,
+        errorMessage: errorMessage
     };
 };
 
