@@ -19,7 +19,13 @@ jobs:
 
     - name: ⚙ Create .env file
       run: |
-        echo "${{ secrets.ENV }}" > .env
+        if [[ -n "${{ secrets.ENV }}" ]]; then
+          echo "${{ secrets.ENV }}" > .env
+          echo "Secret ENV found, created .env file."
+        else
+          echo "Secret ENV not found."
+          exit 1
+        fi
 
     - name: 📁 Cache node_modules global (1/2)
       id: hash-packages_global
