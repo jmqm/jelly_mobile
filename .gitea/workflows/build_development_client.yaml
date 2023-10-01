@@ -102,7 +102,7 @@ jobs:
 
     - name: ⚙ Install dependencies
       run: |
-        yarn install
+        yarn install --verbose
 
     - name: 📋 Test project'
       run: |
