@@ -100,9 +100,9 @@ jobs:
         echo 'node_modules global cache changed'
         yarn global add eas-cli-local-build-plugin
 
-    - name: ⚙ Remove .git directory
+    - name: ⚙ Remove .git directory (blocks yarn installing repositories)
       run: |
-        rm -r .git
+        rm -rv .git
 
     - name: ⚙ Install dependencies
       run: |
