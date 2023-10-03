@@ -13,6 +13,7 @@ import hiddenConfigurations$ from 'src/state/hiddenConfigurations/hiddenConfigur
 import Slider from '@react-native-community/slider';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { VLCPlayer } from '@jmqm/react-native-vlc-media-player';
+import { StatusBar } from 'expo-status-bar';
 import { clamp } from 'src/utilities/General';
 import { ticksToMilliseconds } from 'src/utilities/time';
 
