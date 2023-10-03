@@ -202,6 +202,7 @@ const VideoPlayerScreen = (props: TProps) => {
 
     return (
         <>
+            <StatusBar hidden={true} />
             <Background colour='black' />
             {!hideControls && (<BackButton />)}
 
