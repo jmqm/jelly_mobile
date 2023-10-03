@@ -67,7 +67,6 @@ const VideoPlayerScreen = (props: TProps) => {
         setCheckedPlaybackPosition(true);
 
         setCurrentTime(event.currentTime / 1000);
-        currentTime.current = event.position;
     };
 
     const handleOnEnd = () => {
