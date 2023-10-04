@@ -16,6 +16,7 @@ import { VLCPlayer } from '@jmqm/react-native-vlc-media-player';
 import { StatusBar } from 'expo-status-bar';
 import { clamp } from 'src/utilities/General';
 import { ticksToMilliseconds } from 'src/utilities/time';
+import { MaterialIcons } from '@expo/vector-icons';
 
 type TProps = {
 
