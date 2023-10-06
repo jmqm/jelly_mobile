@@ -96,7 +96,7 @@ const VideoPlayerScreen = (props: TProps) => {
 
     const handleSeek = (time: number) => {
         const newTime = clamp(0, time, duration);
-        videoRef.current?.seek(newTime);
+        videoRef.current?.seek(newTime * 1000);
     };
 
     const handleRewind = () => {
