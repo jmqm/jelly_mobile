@@ -60,7 +60,7 @@ const LibrariesScreen = (props: TProps) => {
             <TopographyPattern />
 
             <View style={[{ paddingTop: useSafeAreaInsets().top }, styles.main]}>
-                <ScrollView style={styles.scrollView}>
+                <ScrollView contentContainerStyle={styles.scrollView}>
                     {libraryComponents && libraryComponents.map((library) => library)}
                 </ScrollView>
             </View>

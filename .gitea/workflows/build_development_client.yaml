@@ -7,7 +7,7 @@ on:
     branches:
       - main
   # Debugging only:
-  push:
+  #push:
 
 jobs:
   main:
@@ -17,7 +17,7 @@ jobs:
     - name: 🏗 Check out repo
       uses: actions/checkout@v3
 
-    - name: ⚙ Create .env file
+    - name: ❄ Create .env file
       run: |
         if [[ -n "${{ secrets.ENV }}" ]]; then
           echo "${{ secrets.ENV }}" > .env
@@ -102,7 +102,7 @@ jobs:
       run: |
         yarn install
 
-    - name: 📋 Test project'
+    - name: 📋 Test project
       run: |
         if grep -Ei '"dependencies"\s*:\s*{\s*"jest"' package.json && grep -Ei '"scripts"\s*:\s*{\s*"test"' package.json; then
           echo 'Running tests'
