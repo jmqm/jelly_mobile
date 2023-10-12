@@ -15,7 +15,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { VLCPlayer } from '@jmqm/react-native-vlc-media-player';
 import { StatusBar } from 'expo-status-bar';
 import { clamp } from 'src/utilities/General';
-import { ticksToMilliseconds } from 'src/utilities/time';
+import { secondsToMilliseconds, ticksToMilliseconds } from 'src/utilities/time';
 import { MaterialIcons } from '@expo/vector-icons';
 
 type TProps = {
@@ -96,7 +96,7 @@ const VideoPlayerScreen = (props: TProps) => {
 
     const handleSeek = (time: number) => {
         const newTime = clamp(0, time, duration);
-        videoRef.current?.seek(newTime * 1000);
+        videoRef.current?.seek(secondsToMilliseconds(newTime));
     };
 
     const handleRewind = () => {
