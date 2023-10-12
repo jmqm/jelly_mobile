@@ -7,7 +7,7 @@ on:
     branches:
       - main
   # Debugging only:
-  #push:
+  push:
 
 jobs:
   main:
