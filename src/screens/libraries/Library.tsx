@@ -1,13 +1,13 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type TLibrariesNavigation from 'src/types/navigation/TLibrariesNavigation';
-import { StyleSheet, View } from 'react-native';
+import { FlatList, StyleSheet, View } from 'react-native';
 import { memo, useEffect, useState } from 'react';
 import type TMedia from 'src/types/jellyfin/media/TMedia';
 import { GetUserLibraryItems } from 'src/services/JellyfinAPI';
 import MediaCard from 'src/components/MediaCard';
 import { FlashList } from '@shopify/flash-list';
 import EMediaType from 'src/enums/EMediaType';
-import { Appbar } from 'react-native-paper';
+import { Appbar, Searchbar } from 'react-native-paper';
 import RotationAnimation from 'src/components/animations/RotationAnimation';
 import TopographyPattern from 'src/components/patterns/TopographyPattern';
 import Background from 'src/components/styled/Background';
@@ -23,6 +23,9 @@ type TProps = {
 const LibraryScreen = (props: TProps) => {
     const { route, navigation } = props;
     const { id: libraryId, name: libraryName } = route.params;
+
+    const [searchString, setSearchString] = useState<string>('');
+    const [searchbarVisible, setSearchbarVisible] = useState<boolean>(false);
 
     const [refreshAnimationValue, setRefreshAnimationValue] = useState(0);
 
@@ -43,7 +46,7 @@ const LibraryScreen = (props: TProps) => {
         setFlashListVisible(false);
         setItems(null);
 
-        setRefreshAnimationValue((previousValue) => previousValue + 1);
+        setRefreshAnimationValue((prev) => prev + 1);
     };
 
     const renderItem = ({ item, index }: { item: TMedia, index: number }) => {
@@ -76,7 +79,8 @@ const LibraryScreen = (props: TProps) => {
     // Get items.
     useEffect(() => {
         const load = async () => {
-            setItems(await GetUserLibraryItems(libraryId));
+            const searchTerm = searchString.length > 0 ? searchString : undefined;
+            setItems(await GetUserLibraryItems(libraryId, searchTerm));
         };
 
         if (!items) {
@@ -102,10 +106,33 @@ const LibraryScreen = (props: TProps) => {
             <TopographyPattern opacity={0.05} />
 
             <Appbar.Header>
-                <Appbar.BackAction onPress={handleOnBackPress} />
-                <Appbar.Content title={libraryName} />
+                <Appbar.BackAction onPress={() => searchbarVisible ? setSearchbarVisible(false) : handleOnBackPress()} />
+                {!searchbarVisible && (
+                    <Appbar.Content title={searchString.length > 0 ? searchString : libraryName}  />
+                )}
 
-                <Appbar.Action icon='magnify'  onPress={() => {}} />
+                {/* TODO: Create a searchItems, so when the user clears search, items shows up */}
+                {!searchbarVisible && searchString.length > 0 && (<Appbar.Action icon='format-clear' onPress={() => { setSearchString(''); setItems(null); }} />)}
+                {!searchbarVisible && searchString.length <= 0 && (<Appbar.Action icon='magnify' onPress={() => setSearchbarVisible((prev) => !prev)} />)}
+                {searchbarVisible && (
+                    <Searchbar
+                        autoFocus={true}
+                        value={searchString}
+                        onChangeText={setSearchString}
+                        style={{ flex: 1, height: '80%' }}
+                        inputStyle={{ padding: 18 }}
+                        onBlur={() => {
+                            if (searchString.length > 0) {
+                                setItems(null);
+                            }
+
+                            setSearchbarVisible(false);
+                        }}
+                        autoComplete='off'
+                        autoCorrect={false}
+                    />
+                )}
+
                 <RotationAnimation animationReference={refreshAnimationValue}>
                     <Appbar.Action icon='refresh' onPress={handleRefreshOnPress} />
                 </RotationAnimation>
@@ -133,6 +160,14 @@ const LibraryScreen = (props: TProps) => {
                             ListHeaderComponent={ItemSeparatorComponent}
                             ListFooterComponent={ItemSeparatorComponent}
                             ItemSeparatorComponent={ItemSeparatorComponent}
+                        />
+                    )}
+
+                    {items && (
+                        <FlatList
+                            data={items}
+                            renderItem={renderItem}
+                            onreach
                         />
                     )}
                 </View>

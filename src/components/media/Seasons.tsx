@@ -1,5 +1,5 @@
 import { ComponentProps } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Divider } from 'react-native-paper';
 import OpacityAnimation from 'src/components/animations/OpacityAnimation';
 import SectionFlatList from 'src/screens/home/SectionFlatList';
@@ -16,7 +16,7 @@ const SeasonsComponent = (props: TProps) => {
     if (series.seasons.length > 0) {
         return (
             <OpacityAnimation duration={100}>
-                <Divider style={[styles.marginHorizontal, styles.marginBottom]} />
+                <View style={styles.marginBottom} />
 
                 {/* TODO: Reduce opacity on watched seasons */}
                 <SectionFlatList imageType='Poster' data={series.seasons} onPress={seasonOnPress} />

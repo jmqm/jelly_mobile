@@ -15,6 +15,7 @@ import type TStartPlayback from 'src/types/jellyfin/TStartPlayback';
 import CMedia from 'src/classes/jellyfin/media/CMedia';
 import type TSeries from 'src/types/jellyfin/media/TSeries';
 import type TSeason from 'src/types/jellyfin/media/TSeason';
+import TReportPlayback from 'src/types/jellyfin/TReportPlayback';
 
 // https://api.jellyfin.org/
 // https://demo.jellyfin.org/stable/api-docs/swagger/index.html (better)
@@ -339,7 +340,6 @@ export const StartPlayback = async (mediaId: string, fallbackToH264: boolean = f
         };
 
         const playbackUrl = fallbackToH264 ? getPlaybackUrlStream() : getPlaybackUrlStatic();
-        // const playbackUrl = getPlaybackUrlStream();
         const playSessionId = await getPlaySessionId();
 
         if (playbackUrl && playSessionId) {
@@ -362,54 +362,37 @@ export const StartPlayback = async (mediaId: string, fallbackToH264: boolean = f
     };
 };
 
-export const ReportPlayback = async (type: 'Started' | 'Progress' | 'Stopped', mediaId: string): Promise<string> => {
+export const ReportPlayback = async (playbackReport: TReportPlayback): Promise<boolean> => {
     // TODO: Unfinished
 
+    const { type, media, sessionId, positionTicks, paused } = playbackReport;
+
     try {
-        const response = await fetch(`${server.address}/Sessions/Playing${type !== 'Started' ? `/${type}` : ''}`, {
+        const url = `${server.address}/Sessions/Playing` +
+            type === 'Progress' ? '/Progress' :
+            type === 'Stopped' ? '/Stopped' :
+            '';
+
+        const response = await fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json', // Without this, will get a 'Network request failed' error.
-                'Accept': 'application/json',
                 ...GenerateAuthorizationHeader()
             },
             body: JSON.stringify({
-                UserId: user.id
+                'PlaySessionId': sessionId,
+                'MediaSourceId': media.id,
+                'PositionTicks': positionTicks,
+                'IsPaused': paused
             })
         });
 
-        const data = await response.text();
-        const dataJson = JSON.parse(data);
+        return response.ok;
     } catch (error) {
         console.log(`${ReportPlayback.name} exception: ${error}`);
     }
 
-    return '';
-};
-
-export const GetSubtitles = async (mediaId: string): Promise<string> => {
-    // TODO: Unfinished
-
-    try {
-        const response = await fetch(`${server.address}/Sessions/Playing${type !== 'Started' ? `/${type}` : ''}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json', // Without this, will get a 'Network request failed' error.
-                'Accept': 'application/json',
-                ...GenerateAuthorizationHeader()
-            },
-            body: JSON.stringify({
-                UserId: user.id
-            })
-        });
-
-        const data = await response.text();
-        const dataJson = JSON.parse(data);
-    } catch (error) {
-        console.log(`${ReportPlayback.name} exception: ${error}`);
-    }
-
-    return '';
+    return false;
 };
 
 //#endregion

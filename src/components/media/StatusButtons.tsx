@@ -26,7 +26,6 @@ const StatusButtonsComponent = (props: TProps) => {
 
             setWatched(response === statusToSet);
             media.userData.watched = response === statusToSet;
-            ToastAndroid.show(`${response ? 'Successfully' : 'Failed to'} set media watched status`, ToastAndroid.SHORT);
         }
     };
 
@@ -39,7 +38,6 @@ const StatusButtonsComponent = (props: TProps) => {
 
             setFavourite(response === statusToSet);
             media.userData.favourite = response === statusToSet;
-            ToastAndroid.show(`${response ? 'Successfully' : 'Failed to'} set media favourite status`, ToastAndroid.SHORT);
         }
     };
 
@@ -50,7 +48,8 @@ const StatusButtonsComponent = (props: TProps) => {
 
     return (
         <>
-            <Divider style={[styles.marginHorizontal, styles.marginBottom]} />
+            <View style={styles.marginBottom} />
+
             <View style={[styles.buttons, styles.marginHorizontal]}>
                 <StyledIconButton onPress={handleOnWatchedPress} selected={watched ?? false} icon={watched === null ? 'timer-sand' : watched ? 'check-bold' : 'check-outline'} mode='contained-tonal' />
                 <StyledIconButton onPress={handleOnFavouritePress} selected={favourite ?? false} icon={favourite === null ? 'timer-sand' : favourite ? 'heart' : 'heart-outline'} mode='contained-tonal' />

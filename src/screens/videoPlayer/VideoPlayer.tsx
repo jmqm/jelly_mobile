@@ -1,8 +1,8 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { GestureResponderEvent, ToastAndroid, TouchableOpacity, View } from 'react-native';
+import { ToastAndroid, TouchableOpacity, View } from 'react-native';
 import { StyleSheet } from 'react-native';
-import { Text } from 'react-native-paper';
+import { List, Modal, Portal, SegmentedButtons, Text } from 'react-native-paper';
 import Background from 'src/components/styled/Background';
 import { StartPlayback } from 'src/services/JellyfinAPI';
 import type TMediaNavigation from 'src/types/navigation/TMediaNavigation';
@@ -44,6 +44,12 @@ const VideoPlayerScreen = (props: TProps) => {
     const [subtitleTrack, setSubtitleTrack] = useState<number>(-1);
     const [subtitleTracks, setSubtitleTracks] = useState<VideoInfo['textTracks']>([]);
 
+    const [audioDelay, setAudioDelay] = useState<number>(0);
+    const [subtitleDelay, setSubtitleDelay] = useState<number>(0);
+
+    const [audioModalVisible, setAudioModalVisible] = useState<boolean>(false);
+    const [subtitleModalVisible, setSubtitleModalVisible] = useState<boolean>(false);
+
     const videoRef = useRef<VLCPlayer | null>(null);
 
 
@@ -51,8 +57,12 @@ const VideoPlayerScreen = (props: TProps) => {
 
     const handleOnLoad = (data: any) => {
         setDuration(data.duration / 1000);
+
         setAudioTracks(data.audioTracks);
         setSubtitleTracks(data.textTracks);
+
+        setAudioTrack(data.audioTrackId);
+        setSubtitleTrack(data.textTrackId);
     };
 
     const handleOnError = (event: SimpleCallbackEventProps) => {
@@ -62,6 +72,7 @@ const VideoPlayerScreen = (props: TProps) => {
 
     const [checkedPlaybackPosition, setCheckedPlaybackPosition] = useState<boolean>(false);
     const handleOnProgress = (event: OnProgressEventProps) => {
+        // Seek on initial load.
         if (!checkedPlaybackPosition && !media.userData.watched && media.userData.playbackPositionTicks) {
             handleSeek(ticksToMilliseconds(media.userData.playbackPositionTicks) / 1000 - 2);
         }
@@ -72,6 +83,7 @@ const VideoPlayerScreen = (props: TProps) => {
     };
 
     const handleOnEnd = () => {
+        console.log('end');
         setPaused(true);
     };
 
@@ -172,7 +184,7 @@ const VideoPlayerScreen = (props: TProps) => {
 
             const goLandscape = async () => {
                 initialOrientationLock = await ScreenOrientation.getOrientationLockAsync();
-                await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
+                await ScreenOrientation.lockAsync(__DEV__ ? ScreenOrientation.OrientationLock.LANDSCAPE_LEFT : ScreenOrientation.OrientationLock.LANDSCAPE);
             };
 
             goLandscape();
@@ -201,11 +213,94 @@ const VideoPlayerScreen = (props: TProps) => {
     );
 
 
+    useEffect(() => {
+        clearTimeout(hideControlsTimeoutRef.current);
+        setHideControls((prev) => !prev);
+
+        const timeoutId = setTimeout(() => setHideControls(true), 3000);
+        hideControlsTimeoutRef.current = timeoutId;
+    }, []);
+
+
+
     return (
         <>
             <StatusBar hidden={true} />
             <Background colour='black' />
             {!hideControls && (<BackButton />)}
+
+            <Portal>
+                {/* Audio changes */}
+                <Modal visible={audioModalVisible} onDismiss={() => setAudioModalVisible(false)} contentContainerStyle={styles.modal}>
+                    <View>
+                        {audioTracks.map((audioTrack) => (
+                            <List.Item
+                                key={audioTrack.id}
+                                title={audioTrack.name}
+                                onPress={() => setAudioTrack(audioTrack.id)}
+                                style={{ borderRadius: 8 }}
+                            />
+                        ))}
+                    </View>
+
+                    <SegmentedButtons
+                        value={''}
+                        onValueChange={() => { }}
+                        buttons={[
+                            {
+                                value: 'decrease',
+                                label: 'Decrease',
+                                onPress: () => setAudioDelay((prev) => prev - 50)
+                            },
+                            {
+                                value: 'currentValue',
+                                label: `${audioDelay}`,
+                                onPress: () => setAudioDelay(0)
+                            },
+                            {
+                                value: 'increase',
+                                label: 'Increase',
+                                onPress: () => setAudioDelay((prev) => prev + 50)
+                            }
+                        ]}
+                    />
+                </Modal>
+
+                {/* Subtitle changes */}
+                <Modal visible={subtitleModalVisible} onDismiss={() => setSubtitleModalVisible(false)} contentContainerStyle={styles.modal}>
+                    <View>
+                        {subtitleTracks.map((subtitleTrack) => (
+                            <List.Item
+                                key={subtitleTrack.id}
+                                title={subtitleTrack.name}
+                                onPress={() => setSubtitleTrack(subtitleTrack.id)}
+                            />
+                        ))}
+                    </View>
+
+                    <SegmentedButtons
+                        value={''}
+                        onValueChange={() => { }}
+                        buttons={[
+                            {
+                                value: 'decrease',
+                                label: 'Decrease',
+                                onPress: () => setSubtitleDelay((prev) => prev - 50)
+                            },
+                            {
+                                value: 'currentValue',
+                                label: `${subtitleDelay}`,
+                                disabled: true
+                            },
+                            {
+                                value: 'increase',
+                                label: 'Increase',
+                                onPress: () => setSubtitleDelay((prev) => prev + 50)
+                            }
+                        ]}
+                    />
+                </Modal>
+            </Portal>
 
             <View style={styles.root} onTouchEnd={handleRootOnTouchStart}>
                 {/* Video player */}
@@ -215,21 +310,25 @@ const VideoPlayerScreen = (props: TProps) => {
                         source={{
                             uri: playbackInfo?.url
                         }}
+                        // Create settings of audio resampler and audio output
+                        // maybe some additional initOptions
+                        initOptions={[
+                            '--play-and-pause',
+                            '--no-color',
+                            '--verbose=0',
+                            '--audio-resampler=soxr', // Android bad audio fix
+                            '--aout=any' // Android bad audio fix
+                        ]}
 
                         resizeMode='contain'
                         style={styles.videoPlayer}
 
                         paused={paused}
                         audioTrack={audioTrack}
-                        onAudioTrackChange={(id) => {
-                            console.log(`onAudioTrackChange: ${id}`);
-                            setAudioTrack(id);
-                        }}
                         textTrack={subtitleTrack}
-                        onTextTrackChange={(id) => {
-                            console.log(`onTextTrackChange: ${id}`);
-                            setSubtitleTrack(id);
-                        }}
+
+                        audioDelay={audioDelay}
+                        textDelay={subtitleDelay}
 
                         // Events
                         onLoad={handleOnLoad}
@@ -242,16 +341,12 @@ const VideoPlayerScreen = (props: TProps) => {
                 {/* Controls */}
                 {!hideControls && (
                     <View style={[styles.controls, styles.topControls]} onTouchEnd={(e) => e.stopPropagation()}>
-                        <TouchableOpacity onPress={handleChangeSubtitle}>
-                            <Text>
-                                Subtitle index: {subtitleTrack}
-                            </Text>
+                        <TouchableOpacity onPress={() => setAudioModalVisible(true)} disabled={audioTracks.length <= 0}>
+                            <MaterialIcons name='multitrack-audio' size={24} color={audioTracks.length <= 0 ? 'gray' : 'white'} />
                         </TouchableOpacity>
 
-                        <TouchableOpacity onPress={handleChangeAudioTrack}>
-                            <Text>
-                                Audio index: {audioTrack}
-                            </Text>
+                        <TouchableOpacity onPress={() => setSubtitleModalVisible(true)} disabled={subtitleTracks.length <= 0}>
+                            <MaterialIcons name='subtitles' size={24} color={subtitleTracks.length <= 0 ? 'gray' : 'white'} />
                         </TouchableOpacity>
                     </View>
                 )}
@@ -309,7 +404,8 @@ const styles = StyleSheet.create({
         right: 0
     },
     videoPlayer: {
-        flex: 1
+        flex: 1,
+        objectFit: 'cover'
     },
     controls: {
         position: 'absolute',
@@ -323,7 +419,7 @@ const styles = StyleSheet.create({
         right: 0,
         display: 'flex',
         flexDirection: 'row',
-        justifyContent: 'center',
+        justifyContent: 'flex-end',
         gap: 32
     },
     bottomControls: {
@@ -349,6 +445,14 @@ const styles = StyleSheet.create({
         width: '100%',
         paddingVertical: 8,
         gap: 32
+    },
+    modal: {
+        display: 'flex',
+        gap: 16,
+        padding: 16,
+        alignSelf: 'center',
+        justifyContent: 'center',
+        width: 350
     }
 });
 
