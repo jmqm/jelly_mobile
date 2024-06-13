@@ -1,12 +1,24 @@
-## Jelly Mobile
+## ⚠ This project has been abandoned ⚠
 
-### Prerequisites
-- Log in to Expo that will run the development server using `expo login`.
+Worked on this for almost a year, ultimately abandoned due to difficulties. Hopefully the code will be beneficial to someone; though please open source the project :) .
 
-### How to debug
-1. Run command `yarn build_development` to create a development build.
-2. Install development build.
-3. Open development build.
-4. Log in to development build.
-5. Run command `yarn dstart`.
-6. Connect to development server via url or in the list of development servers.
+<br />
+
+Problems:
+- Integrating MPV with React Native Expo (better subtitles)
+- Styling (want some parts of the UI to look a certain way, React Native couldn't do it)
+
+<br />
+
+Example images:
+
+![Home](./assets/readme/home.png)
+![Library](./assets/readme/library.png)
+![Movie](./assets/readme/movie.png)
+![Series](./assets/readme/series.png)
+
+<br />
+
+I include this random cat gif because it's funny
+
+![cat](./assets/readme/cat.gif)
